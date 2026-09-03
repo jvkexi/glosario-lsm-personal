@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#dff3f0">
+
+    <title>Glosario LSM</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="./manifest.json">
+</head>
+
+<body>
+
+    <!-- ================================
+         ENCABEZADO
+    ================================= -->
+
+    <header class="header" id="mainHeader">
+
+        <div class="header-content">
+
+            <div>
+                <span class="eyebrow">
+                    Lengua de Señas Mexicana
+                </span>
+
+                <h1>
+                    Glosario LSM
+                </h1>
+
+                <p>
+                    Aprende, consulta y descubre las señas de nuestro curso.
+                </p>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================================
+         CONTENIDO PRINCIPAL
+    ================================= -->
+
+    <main class="container">
+
+
+        <!-- ================================
+             BUSCADOR PRINCIPAL
+        ================================= -->
+
+        <section class="search-section">
+
+            <div class="search-box">
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Buscar una seña..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================
+             CATEGORÍAS
+        ================================= -->
+
+        <section class="categories-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">
+                        Explorar
+                    </span>
+
+                    <h2>
+                        Categorías
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div
+                id="categoriesContainer"
+                class="categories"
+            >
+                <!-- Las categorías aparecerán aquí -->
+            </div>
+
+        </section>
+
+
+        <!-- ================================
+             DICCIONARIO
+        ================================= -->
+
+        <section class="dictionary-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">
+                        Consulta
+                    </span>
+
+                    <h2>
+                        Diccionario de señas
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <article
+                class="dictionary-card"
+                id="openDictionary"
+            >
+
+                <div class="dictionary-icon">
+                    📖
+                </div>
+
+
+                <div class="dictionary-info">
+
+                    <h3>
+                        Diccionario
+                    </h3>
+
+                    <p>
+                        Consulta todas las señas
+                        en orden alfabético.
+                    </p>
+
+                </div>
+
+
+                <span class="dictionary-arrow">
+                    →
+                </span>
+
+            </article>
+
+        </section>
+
+
+        <!-- ================================
+             VISTA DE CATEGORÍA
+        ================================= -->
+
+        <section
+            id="categoryView"
+            class="hidden"
+        >
+
+            <button
+                id="backFromCategory"
+                class="back-button"
+            >
+                ← Volver
+            </button>
+
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        Categoría
+                    </span>
+
+                    <h2 id="categoryTitle"></h2>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="categorySignsContainer"
+                class="signs-grid"
+            >
+                <!-- Las señas aparecerán aquí -->
+            </div>
+
+        </section>
+
+
+        <!-- ================================
+             VISTA DEL DICCIONARIO
+        ================================= -->
+
+        <section
+            id="dictionaryView"
+            class="dictionary-view hidden"
+        >
+
+            <button
+                id="backFromDictionary"
+                class="back-button"
+            >
+                ← Volver
+            </button>
+
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-label">
+                        Glosario completo
+                    </span>
+
+                    <h2>
+                        Diccionario de señas
+                    </h2>
+
+                </div>
+
+
+                <span
+                    id="dictionaryCount"
+                    class="sign-count"
+                >
+                    0 señas
+                </span>
+
+            </div>
+
+
+            <div class="search-box dictionary-search">
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input
+                    type="search"
+                    id="dictionarySearch"
+                    placeholder="Buscar una seña..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div id="dictionaryContainer">
+                <!-- Las señas aparecerán aquí -->
+            </div>
+
+        </section>
+
+        <button
+    type="button"
+    id="resetDataButton"
+    class="new-category-button"
+>
+    ↩️ Restaurar datos originales
+</button>
+
+<button
+    type="button"
+    id="exportDataButton"
+    class="new-category-button"
+>
+    📤 Exportar glosario
+</button>
+
+<button
+    type="button"
+    id="importDataButton"
+    class="new-category-button"
+>
+    📥 Importar glosario
+</button>
+
+<input
+    type="file"
+    id="importFileInput"
+    accept=".json,application/json"
+    class="hidden"
+>
+
+
+        <!-- ================================
+             VISTA INDIVIDUAL DE LA SEÑA
+        ================================= -->
+
+        <section
+            id="signDetailView"
+            class="sign-detail-view hidden"
+        >
+
+            <button
+                id="backFromSignDetail"
+                class="back-button"
+            >
+                ← Volver
+            </button>
+
+
+            <div class="sign-detail-card">
+
+
+                <!-- CABECERA -->
+
+                <div class="sign-detail-header">
+
+                    <span
+                        id="signDetailCategory"
+                        class="category-badge"
+                    ></span>
+
+                    <h2 id="signDetailTitle"></h2>
+
+                </div>
+
+
+                <!-- IMAGEN -->
+
+                <div
+                    id="signDetailImage"
+                    class="sign-detail-image"
+                ></div>
+
+
+                <!-- INFORMACIÓN -->
+
+                <div class="sign-detail-information">
+
+
+                    <!-- CONFIGURACIÓN MANUAL -->
+
+                    <div class="detail-field">
+
+                        <h3>
+                            Configuración manual
+                        </h3>
+
+                        <p id="signDetailManualConfiguration">
+                            No especificada.
+                        </p>
+
+                    </div>
+
+
+                    <!-- ORIENTACIÓN -->
+
+                    <div class="detail-field">
+
+                        <h3>
+                            Orientación
+                        </h3>
+
+                        <p id="signDetailOrientation">
+                            No especificada.
+                        </p>
+
+                    </div>
+
+
+                    <!-- UBICACIÓN -->
+
+                    <div class="detail-field">
+
+                        <h3>
+                            Ubicación
+                        </h3>
+
+                        <p id="signDetailLocation">
+                            No especificada.
+                        </p>
+
+                    </div>
+
+
+                    <!-- MOVIMIENTO -->
+
+                    <div class="detail-field">
+
+                        <h3>
+                            Movimiento
+                        </h3>
+
+                        <p id="signDetailMovement">
+                            No especificado.
+                        </p>
+
+                    </div>
+
+
+                    <!-- RASGOS NO MANUALES -->
+
+                    <div class="detail-field">
+
+                        <h3>
+                            Rasgos no manuales
+                        </h3>
+
+                        <p id="signDetailNonManualFeatures">
+                            No especificados.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+            <div class="sign-detail-actions">
+
+    <button
+        type="button"
+        id="editSignButton"
+        class="edit-button"
+    >
+        ✏️ Editar seña
+    </button>
+
+    <button
+        type="button"
+        id="deleteSignButton"
+        class="delete-button"
+    >
+        🗑️ Eliminar seña
+    </button>
+
+</div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================================
+         BOTÓN FLOTANTE
+    ================================= -->
+
+    <button
+        class="floating-add-button"
+        id="openAddModal"
+        aria-label="Agregar nueva seña"
+    >
+
+        <span>
+            ＋
+        </span>
+
+        <strong>
+            Nueva seña
+        </strong>
+
+    </button>
+
+
+    <!-- ================================
+         MODAL: NUEVA SEÑA
+    ================================= -->
+
+    <div
+        id="signModal"
+        class="modal hidden"
+    >
+
+        <div
+            class="modal-overlay"
+            id="closeModalOverlay"
+        ></div>
+
+
+        <div class="modal-content">
+
+
+            <!-- CABECERA DEL MODAL -->
+
+            <div class="modal-header">
+
+                <div>
+
+                    <span class="section-label">
+                        Glosario
+                    </span>
+
+                    <h2>
+                        Nueva seña
+                    </h2>
+
+                </div>
+
+
+                <button
+                    class="close-button"
+                    id="closeAddModal"
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- FORMULARIO -->
+
+            <form id="signForm">
+
+
+                <!-- NOMBRE -->
+
+                <div class="form-group">
+
+                    <label for="signName">
+                        Nombre de la seña
+                    </label>
+
+                    <input
+                        type="text"
+                        id="signName"
+                        placeholder="Ej. Manzana"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CATEGORÍA -->
+
+                <div class="form-group">
+
+                    <label for="signCategory">
+                        Categoría
+                    </label>
+
+                    <select
+                        id="signCategory"
+                        required
+                    >
+
+                        <option value="">
+                            Selecciona una categoría
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        type="button"
+                        class="new-category-button"
+                        id="createCategoryButton"
+                    >
+                        ＋ Crear nueva categoría
+                    </button>
+
+                    
+
+                </div>
+
+
+                <!-- FOTO -->
+
+                <div class="form-group">
+
+                    <label for="signImage">
+                        Fotografía
+                    </label>
+
+                    <input
+                        type="file"
+                        id="signImage"
+                        accept="image/*"
+                    >
+
+                    <small>
+                        La imagen se optimizará antes de guardarse.
+                    </small>
+
+                </div>
+
+
+                <!-- ELEMENTOS DE LA SEÑA -->
+
+                <div class="form-elements">
+
+                    <h3>
+                        Elementos que componen una seña
+                    </h3>
+
+
+                    <!-- CONFIGURACIÓN MANUAL -->
+
+                    <div class="form-group">
+
+                        <label for="manualConfiguration">
+                            Configuración manual
+                        </label>
+
+                        <textarea
+                            id="manualConfiguration"
+                            placeholder="Describe la forma que adoptan las manos..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- ORIENTACIÓN -->
+
+                    <div class="form-group">
+
+                        <label for="orientation">
+                            Orientación
+                        </label>
+
+                        <textarea
+                            id="orientation"
+                            placeholder="Describe la orientación de la palma..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- UBICACIÓN -->
+
+                    <div class="form-group">
+
+                        <label for="location">
+                            Ubicación
+                        </label>
+
+                        <textarea
+                            id="location"
+                            placeholder="¿Dónde se realiza la seña?"
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- MOVIMIENTO -->
+
+                    <div class="form-group">
+
+                        <label for="movement">
+                            Movimiento
+                        </label>
+
+                        <textarea
+                            id="movement"
+                            placeholder="Describe el movimiento de las manos..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- RASGOS NO MANUALES -->
+
+                    <div class="form-group">
+
+                        <label for="nonManualFeatures">
+                            Rasgos no manuales
+                        </label>
+
+                        <textarea
+                            id="nonManualFeatures"
+                            placeholder="Describe expresiones faciales o movimientos corporales..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACCIONES -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-button"
+                        id="cancelAdd"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        Guardar seña
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+
+    <script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener(
+            "load",
+            () => {
+                navigator.serviceWorker.register(
+                    "./server-worker.js"
+                )
+                .then(
+                    registration => {
+                        console.log(
+                            "Service Worker registrado:",
+                            registration.scope
+                        );
+                    }
+                )
+                .catch(
+                    error => {
+                        console.error(
+                            "Error registrando Service Worker:",
+                            error
+                        );
+                    }
+                );
+            }
+        );
+    }
+</script>
+
+</body>
+
+</html>

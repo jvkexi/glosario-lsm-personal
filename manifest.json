@@ -1,0 +1,11 @@
+{
+    "name": "Glosario LSM",
+    "short_name": "Glosario LSM",
+    "description": "Glosario de Lengua de Señas Mexicana",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#eef8f6",
+    "theme_color": "#4b9c9a",
+    "orientation": "portrait-primary",
+    "icons": []
+}
