@@ -72,10 +72,10 @@ let emojiAliases = {};
 // ========================================
 
 const SUPABASE_URL =
-    "https://svhzyjifhezgxvqiyebl.supabase.co";
+    "https://zyfuzjscnpdqqzsbojwq.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_MhimkztuRxdhUi95Bg85aQ_Tws7E1z5";
+    "sb_publishable_9rSbng-6BIoAIp616QM0yQ_6QO22z4V";
 
 const supabaseClient =
     window.supabase.createClient(
