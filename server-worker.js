@@ -1,4 +1,4 @@
-const CACHE_NAME = "glosario-lsm-v2";
+const CACHE_NAME = "glosario-lsm-v90";
 
 const FILES_TO_CACHE = [
     "./",
@@ -61,27 +61,44 @@ self.addEventListener(
 );
 
 
+// ========================================
+// INTERCEPTAR SOLICITUDES
+// ========================================
+
 self.addEventListener(
     "fetch",
     event => {
 
+        const requestURL =
+            new URL(event.request.url);
+
+        // ========================================
+        // NO INTERCEPTAR SERVICIOS EXTERNOS
+        // ========================================
+
+        if (
+            requestURL.origin !== self.location.origin
+        ) {
+            return;
+        }
+
+        // ========================================
+        // GESTIONAR RECURSOS LOCALES
+        // ========================================
+
         event.respondWith(
-            caches.match(
-                event.request
-            )
-            .then(
-                cachedResponse => {
+
+            caches.match(event.request)
+                .then(cachedResponse => {
 
                     if (cachedResponse) {
                         return cachedResponse;
                     }
 
-                    return fetch(
-                        event.request
-                    );
+                    return fetch(event.request);
 
-                }
-            )
+                })
+
         );
 
     }

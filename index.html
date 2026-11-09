@@ -32,25 +32,38 @@
 
     <header class="header" id="mainHeader">
 
-        <div class="header-content">
+   <div class="header-brand">
 
-            <div>
-                <span class="eyebrow">
-                    Lengua de Señas Mexicana
-                </span>
+    <div class="header-brand-main">
 
-                <h1>
-                    Glosario LSM
-                </h1>
-
-                <p>
-                    Señas del curso
-                </p>
-            </div>
-
+        <div class="header-logo">
+            <svg
+                viewBox="0 0 48 48"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="M13 23 V9 A3 3 0 0 1 19 9 V21"/>
+                <path d="M19 20 V6 A3 3 0 0 1 25 6 V21"/>
+                <path d="M25 20 V9 A3 3 0 0 1 31 9 V23"/>
+                <path d="M31 22 V15 A3 3 0 0 1 37 15 V31 C37 39 32 43 25 43 H20 C15 43 12 40 9 35 L5 28 A3 3 0 0 1 10 24 L15 30"/>
+            </svg>
         </div>
 
-    </header>
+        <h1>LSM</h1>
+
+    </div>
+
+    <p>Lengua de Señas Mexicana</p>
+
+</div>
+
+    </div>
+
+</header>
 
 
     <!-- ================================
@@ -60,112 +73,195 @@
     <main class="container">
 
 
-        <!-- ================================
-             BUSCADOR PRINCIPAL
-        ================================= -->
 
-        <section class="search-section">
+<!-- =================================
+     PANTALLA PRINCIPAL: INICIO
+================================= -->
 
-            <div class="search-box">
+<section class="home-dashboard">
 
-                <span class="search-icon">
-                    ⌕
-                </span>
+   <div class="home-heading">
+    <h2>Contenido</h2>
+</div>
 
-                <input
-                    type="search"
-                    id="searchInput"
-                    placeholder="Buscar una seña..."
-                    autocomplete="off"
-                >
+    <!-- ACCESOS PRINCIPALES -->
 
-            </div>
+<div class="home-main-cards">
+    <button type="button" class="home-main-card" id="openDictionary">
+<span class="home-card-icon dictionary-home-icon">
+    <svg
+        viewBox="0 0 48 48"
+        width="44"
+        height="44"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <path d="M24 13 C19 8 11 8 5 11 V36 C12 33 19 34 24 39"/>
+        <path d="M24 13 C29 8 37 8 43 11 V36 C36 33 29 34 24 39"/>
+        <path d="M24 13 V39"/>
+        <path d="M10 17 C14 16 18 17 20 19"/>
+        <path d="M28 19 C31 17 35 16 38 17"/>
+        <path d="M10 24 C14 23 18 24 20 26"/>
+        <path d="M28 26 C31 24 35 23 38 24"/>
+    </svg>
+</span>        <span class="home-card-title">Diccionario de señas</span>
+    </button>
 
-        </section>
+    <button type="button" class="home-main-card" id="openCategories">
+<span class="home-card-icon categories-home-icon">
+    <svg
+        viewBox="0 0 48 48"
+        width="44"
+        height="44"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <rect x="5" y="6" width="16" height="15" rx="4"/>
+        <rect x="27" y="6" width="16" height="15" rx="4"/>
+        <rect x="5" y="27" width="16" height="15" rx="4"/>
+        <rect x="27" y="27" width="16" height="15" rx="4"/>
+        <path d="M10 13 H16 M32 13 H38 M10 34 H16 M32 34 H38"/>
+    </svg>
+</span>        <span class="home-card-title">Señas por categoría</span>
+    </button>
 
+    <button type="button" class="home-main-card" id="openSignTypes">
+<span class="home-card-icon sign-types-home-icon">
+    <svg
+        viewBox="0 0 48 48"
+        width="44"
+        height="44"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <path d="M17 23 V9 A3 3 0 0 1 23 9 V21"/>
+        <path d="M23 20 V6 A3 3 0 0 1 29 6 V21"/>
+        <path d="M29 20 V10 A3 3 0 0 1 35 10 V25"/>
+        <path d="M35 23 V18 A3 3 0 0 1 41 18 V31 C41 40 35 44 27 44 H21 C16 44 13 41 10 36 L5 28 A3 3 0 0 1 10 24 L17 32"/>
+    </svg>
+</span>        <span class="home-card-title">Tipos de señas</span>
+    </button>
 
-        <!-- ================================
-             CATEGORÍAS
-        ================================= -->
+<button
+    type="button"
+    class="home-main-card"
+    id="openCharacteristics"
+>
+    <span class="home-card-icon characteristics-home-icon">
+        <svg
+            viewBox="0 0 48 48"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M13 23 V10 A3 3 0 0 1 19 10 V21"/>
+            <path d="M19 20 V6 A3 3 0 0 1 25 6 V21"/>
+            <path d="M25 20 V9 A3 3 0 0 1 31 9 V23"/>
+            <path d="M31 22 V15 A3 3 0 0 1 37 15 V31 C37 39 32 43 25 43 H20 C15 43 12 40 9 35 L5 28 A3 3 0 0 1 10 24 L15 30"/>
+        </svg>
+    </span>
+    <span class="home-card-title">Características de la seña</span>
+</button>
 
-        <section class="categories-section">
+<button
+    type="button"
+    class="home-main-card"
+    id="openGrammar"
+>
+    <span class="home-card-icon grammar-home-icon">
+        <svg
+            viewBox="0 0 48 48"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M7 10 C13 7 19 8 24 12 V40 C19 36 13 35 7 38 Z"/>
+            <path d="M41 10 C35 7 29 8 24 12 V40 C29 36 35 35 41 38 Z"/>
+            <path d="M13 17 H19"/>
+            <path d="M13 23 H19"/>
+            <path d="M29 17 H35"/>
+            <path d="M29 23 H35"/>
+        </svg>
+    </span>
+    <span class="home-card-title">Gramática de la LSM</span>
+</button>
 
-            <div class="section-heading">
+</div>
 
-                <div>
-                    <span class="section-label">
-                        Contenido
-                    </span>
+</section>
 
-                    <h2>
-                        Categorías
-                    </h2>
-                </div>
+<!-- =================================
+     VISTA: EXPLORAR
+================================= -->
 
-            </div>
+<section id="exploreView" class="search-section hidden">
 
+    <div class="section-heading">
+        <div>
+            <span class="section-label">Búsqueda</span>
+            <h2>Explorar señas</h2>
+        </div>
+    </div>
 
-            <div
-                id="categoriesContainer"
-                class="categories"
-            >
-                <!-- Las categorías aparecerán aquí -->
-            </div>
+    <div class="search-box">
+        <span class="search-icon">⌕</span>
 
-        </section>
+        <input
+            type="search"
+            id="searchInput"
+            placeholder="¿Qué seña estás buscando?"
+            autocomplete="off"
+        >
+    </div>
 
+    <div id="searchSuggestions" class="search-suggestions"></div>
 
-        <!-- ================================
-             DICCIONARIO
-        ================================= -->
+</section>
 
-        <section class="dictionary-section">
+<!-- =================================
+     VISTA: LISTA DE CATEGORÍAS
+================================= -->
 
-            <div class="section-heading">
+<section id="categoriesView" class="categories-section hidden">
 
-                <div>
-                    <span class="section-label">
-                        Más contenido
-                    </span>
+    <button
+        id="backFromCategories"
+        class="back-button"
+        type="button"
+    >
+        ← Volver
+    </button>
 
-                    <h2>
-                        Diccionario de señas
-                    </h2>
-                </div>
+    <div class="section-heading">
+        <div>
+            <span class="section-label">Explorar</span>
+            <h2>Señas por categoría</h2>
+        </div>
+    </div>
 
-            </div>
+    <div id="categoriesContainer" class="categories">
+        <!-- Las categorías aparecerán aquí -->
+    </div>
 
-
-            <article
-                class="dictionary-card"
-                id="openDictionary"
-            >
-
-                <div class="dictionary-icon">
-                    📖
-                </div>
-
-
-                <div class="dictionary-info">
-
-                    <h3>
-                        Diccionario
-                    </h3>
-
-                    <p>
-                        Todas las señas en orden alfabético
-                    </p>
-
-                </div>
-
-
-                <span class="dictionary-arrow">
-                    →
-                </span>
-
-            </article>
-
-        </section>
+</section>
 
 
         <!-- ================================
@@ -274,36 +370,312 @@
 
         </section>
 
-        <button
-    type="button"
-    id="resetDataButton"
-    class="new-category-button"
->
-    ↩️ Restaurar datos originales
-</button>
+        
+<!-- =================================
+     VISTA: TIPOS DE SEÑAS
+================================= -->
 
-<button
-    type="button"
-    id="exportDataButton"
-    class="new-category-button"
->
-    📤 Exportar glosario
-</button>
+<section id="signTypesView" class="information-view hidden">
 
-<button
-    type="button"
-    id="importDataButton"
-    class="new-category-button"
->
-    📥 Importar glosario
-</button>
+    <button
+        type="button"
+        id="backFromSignTypes"
+        class="back-button"
+    >
+        ← Volver
+    </button>
 
-<input
-    type="file"
-    id="importFileInput"
-    accept=".json,application/json"
-    class="hidden"
->
+    <div class="section-heading">
+        <div>
+            <span class="section-label">Aprende LSM</span>
+            <h2>Tipos de señas</h2>
+        </div>
+    </div>
+
+    <div class="information-card">
+
+    <div class="note-intro">
+        <span class="note-kicker">LINGÜÍSTICA DE LA LSM</span>
+
+        <h3>Clasificación de las señas</h3>
+
+        <p>
+            Las señas pueden clasificarse de acuerdo con la
+            participación de las manos, su estructura articulatoria
+            y la relación que mantienen con aquello que representan.
+            Estas categorías permiten describir distintos aspectos
+            de su formación y funcionamiento.
+        </p>
+    </div>
+
+    <div class="note-section">
+
+        <h3>01. Según el uso de las manos</h3>
+
+        <div class="note-topic">
+            <h4>Señas manuales o unimanuales</h4>
+            <p>
+                Se articulan principalmente con una sola mano.
+                Su configuración, orientación, ubicación y movimiento
+                participan en la formación de la seña.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas bimanuales</h4>
+            <p>
+                Se articulan mediante la participación de ambas manos.
+                La relación entre ellas puede organizarse de distintas
+                maneras, de acuerdo con el movimiento y la función
+                que desempeña cada una.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas simétricas</h4>
+            <p>
+                Ambas manos participan de manera coordinada y realizan
+                movimientos relacionados entre sí, generalmente
+                mediante una disposición semejante o en espejo.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas asimétricas</h4>
+            <p>
+                Las manos desempeñan funciones diferentes durante
+                la articulación. Una puede actuar como base o punto
+                de referencia, mientras la otra realiza el movimiento
+                principal.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="note-section">
+
+        <h3>02. Según su estructura</h3>
+
+        <div class="note-topic">
+            <h4>Señas simples</h4>
+            <p>
+                Se articulan como una unidad léxica y no requieren
+                la combinación de varias señas independientes
+                para constituirse.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas compuestas</h4>
+            <p>
+                Se forman mediante la combinación de dos o más
+                elementos o señas, cuya articulación conjunta
+                constituye una unidad con significado propio.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="note-section">
+
+        <h3>03. Según su relación con el referente</h3>
+
+        <div class="note-topic">
+            <h4>Señas icónicas</h4>
+            <p>
+                Presentan una relación de semejanza entre alguno
+                de sus rasgos articulatorios y características
+                del referente. Esta relación no significa que
+                reproduzcan necesariamente su apariencia de
+                manera exacta.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas arbitrarias</h4>
+            <p>
+                No presentan una relación de semejanza evidente
+                entre su forma articulatoria y el significado
+                que representan. Su significado se establece
+                mediante las convenciones de la comunidad
+                lingüística.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas inicializadas</h4>
+            <p>
+                Incorporan una configuración manual relacionada
+                con la letra inicial de una palabra del español.
+                Esta característica forma parte de determinados
+                procesos de formación léxica de la LSM.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Señas deícticas o indexicales</h4>
+            <p>
+                Su interpretación depende de la referencia
+                que establecen dentro del espacio de señas
+                y del contexto comunicativo.
+            </p>
+        </div>
+
+        <div class="note-topic">
+            <h4>Deletreo manual y formas lexicalizadas</h4>
+            <p>
+                El deletreo manual representa letras mediante
+                configuraciones de la mano. En determinados
+                casos, estas secuencias pueden incorporarse
+                al vocabulario de la lengua y adquirir un
+                funcionamiento léxico.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="note-section note-observation">
+        <h3>Una precisión importante</h3>
+        <p>
+            Las clasificaciones no siempre representan categorías
+            excluyentes. Una seña puede describirse desde más de
+            un criterio: por el uso de las manos, por su estructura
+            y por la relación que mantiene con su referente.
+        </p>
+    </div>
+
+    <div class="note-sources">
+        <h4>Fuentes de consulta</h4>
+        <p>
+            Diccionario de Lengua de Señas Mexicana de la Ciudad
+            de México (2017).
+        </p>
+        <p>
+            Cruz-Aldrete, Miroslava (2008).
+            <em>Gramática de la Lengua de Señas Mexicana.</em>
+        </p>
+    </div>
+
+</div>
+
+</section>
+
+<!-- =================================
+     VISTA: GRAMÁTICA DE LA LSM
+================================= -->
+
+<section id="grammarView" class="information-view hidden">
+
+    <button
+        type="button"
+        id="backFromGrammar"
+        class="back-button"
+    >
+        ← Volver
+    </button>
+
+    <div class="section-heading">
+        <div>
+            <span class="section-label">Aprende LSM</span>
+            <h2>Gramática de la LSM</h2>
+        </div>
+    </div>
+
+    <div class="information-card">
+
+        <div id="grammarContent">
+
+    <nav class="feature-note-navigation">
+        <button data-grammar-link="systems">
+            Lenguas y sistemas
+        </button>
+
+        <button data-grammar-link="syntax">
+            Sintaxis
+        </button>
+
+        <button data-grammar-link="glosses">
+            Glosas
+        </button>
+
+        <button data-grammar-link="conventions">
+            Convenciones
+        </button>
+
+        <button data-grammar-link="exercises">
+            Ejercicios de clase
+        </button>
+    </nav>
+
+    <div id="grammarInfoContent"
+         class="information-placeholder">
+    </div>
+
+</div>
+
+</div>
+
+    </div>
+
+</section>
+
+
+<!-- =================================
+     VISTA: CARACTERÍSTICAS DE LA SEÑA
+================================= -->
+
+<section id="featureInfoView" class="information-view hidden">
+
+    <button
+        type="button"
+        id="backFromFeature"
+        class="back-button"
+    >
+        ← Volver
+    </button>
+
+    <div class="section-heading">
+        <div>
+            <span class="section-label">Características de la seña</span>
+            <h2 id="featureInfoTitle"></h2>
+        </div>
+    </div>
+
+    <div class="information-card">
+
+    <nav class="feature-note-navigation">
+
+        <button data-feature-link="configuration">
+            Configuración
+        </button>
+
+        <button data-feature-link="orientation">
+            Orientación
+        </button>
+
+        <button data-feature-link="location">
+            Ubicación
+        </button>
+
+        <button data-feature-link="movement">
+            Movimiento
+        </button>
+
+        <button data-feature-link="nonManual">
+            Rasgos no manuales
+        </button>
+
+    </nav>
+
+    <div id="featureInfoContent" class="information-placeholder">
+        <!-- Contenido de la característica seleccionada -->
+    </div>
+
+</div>
+
+</section>
+
+
 
 
         <!-- ================================
@@ -352,65 +724,27 @@
 
                 <div class="sign-detail-information">
 
-
-                    <!-- CONFIGURACIÓN MANUAL -->
-
                     <div class="detail-field">
 
-                        <h3>
-                            Configuración manual
-                        </h3>
+    <h3>
+        Significado o sinónimos
+    </h3>
 
-                        <p id="signDetailManualConfiguration">
-                            No especificada.
-                        </p>
+    <p id="signDetailMeaning">
+        No especificado.
+    </p>
 
-                    </div>
-
-
-                    <!-- ORIENTACIÓN -->
-
-                    <div class="detail-field">
-
-                        <h3>
-                            Orientación
-                        </h3>
-
-                        <p id="signDetailOrientation">
-                            No especificada.
-                        </p>
-
-                    </div>
+</div>
 
 
-                    <!-- UBICACIÓN -->
+                    <!-- CONFIGURACIÓN MANUAL Y ORIENTACIÓN -->
 
-                    <div class="detail-field">
-
-                        <h3>
-                            Ubicación
-                        </h3>
-
-                        <p id="signDetailLocation">
-                            No especificada.
-                        </p>
-
-                    </div>
-
-
-                    <!-- MOVIMIENTO -->
-
-                    <div class="detail-field">
-
-                        <h3>
-                            Movimiento
-                        </h3>
-
-                        <p id="signDetailMovement">
-                            No especificado.
-                        </p>
-
-                    </div>
+<div
+    id="signDetailHandDetails"
+    class="detail-hand-details"
+>
+    <!-- Aquí aparecerán los cuadrantes de cada mano o elemento -->
+</div>
 
 
                     <!-- RASGOS NO MANUALES -->
@@ -456,6 +790,31 @@
 
     </main>
 
+        <!-- ================================
+         BARRA DE NAVEGACIÓN INFERIOR
+    ================================= -->
+
+    <nav class="bottom-navigation" id="bottomNavigation">
+
+        <button
+            type="button"
+            class="navigation-item active"
+            id="navHome"
+        >
+            <span class="navigation-icon">⌂</span>
+            <span>Inicio</span>
+        </button>
+
+        <button
+            type="button"
+            class="navigation-item"
+            id="navExplore"
+        >
+            <span class="navigation-icon">⌕</span>
+            <span>Explorar</span>
+        </button>
+
+    </nav>
 
     <!-- ================================
          BOTÓN FLOTANTE
@@ -546,6 +905,22 @@
 
                 </div>
 
+                <!-- SIGNIFICADO O SINÓNIMOS -->
+
+                <div class="form-group">
+
+                    <label for="signMeaning">
+                        Significado o sinónimos
+                    </label>
+
+                    <textarea
+                        id="signMeaning"
+                        placeholder="Ej. Fruta, alimento, manzana roja..."
+                        rows="3"
+                    ></textarea>
+
+                </div>
+
 
                 <!-- CATEGORÍA -->
 
@@ -556,9 +931,8 @@
                     </label>
 
                     <select
-                        id="signCategory"
-                        required
-                    >
+    id="signCategory"
+>
 
                         <option value="">
                             Selecciona una categoría
@@ -580,119 +954,72 @@
                 </div>
 
 
-                <!-- FOTO -->
-
-                <div class="form-group">
-
-                    <label for="signImage">
-                        Fotografía
-                    </label>
-
-                    <input
-                        type="file"
-                        id="signImage"
-                        accept="image/*"
-                    >
-
-                    <small>
-                        La imagen se optimizará antes de guardarse.
-                    </small>
-
-                </div>
-
 
                 <!-- ELEMENTOS DE LA SEÑA -->
 
-                <div class="form-elements">
+                <!-- TIPO DE SEÑA -->
 
-                    <h3>
-                        Elementos que componen una seña
-                    </h3>
+ 
+                <div class="form-group">
 
-
-                    <!-- CONFIGURACIÓN MANUAL -->
-
-                    <div class="form-group">
-
-                        <label for="manualConfiguration">
-                            Configuración manual
-                        </label>
-
-                        <textarea
-                            id="manualConfiguration"
-                            placeholder="Describe la forma que adoptan las manos..."
-                        ></textarea>
-
-                    </div>
+   
+                    <label for="signType">
+    
+                        Tipo de seña
+   
+                    </label>
 
 
-                    <!-- ORIENTACIÓN -->
+    
+                    <select
+    
+                    id="signType"
+    
+                    required
+    
+                    >
+                    
+                    <option value="">
+       
+                        Selecciona el tipo de seña
+       
+                    </option>
 
-                    <div class="form-group">
+       
+                    <option value="manual">
+       
+                        Manual
+       
+                    </option>
 
-                        <label for="orientation">
-                            Orientación
-                        </label>
+       
+                    <option value="bimanual">
+       
+                        Bimanual
+       
+                    </option>
 
-                        <textarea
-                            id="orientation"
-                            placeholder="Describe la orientación de la palma..."
-                        ></textarea>
-
-                    </div>
-
-
-                    <!-- UBICACIÓN -->
-
-                    <div class="form-group">
-
-                        <label for="location">
-                            Ubicación
-                        </label>
-
-                        <textarea
-                            id="location"
-                            placeholder="¿Dónde se realiza la seña?"
-                        ></textarea>
-
-                    </div>
-
-
-                    <!-- MOVIMIENTO -->
-
-                    <div class="form-group">
-
-                        <label for="movement">
-                            Movimiento
-                        </label>
-
-                        <textarea
-                            id="movement"
-                            placeholder="Describe el movimiento de las manos..."
-                        ></textarea>
-
-                    </div>
+       
+                    <option value="compuesta">
+       
+                        Compuesta
+       
+                    </option>
 
 
-                    <!-- RASGOS NO MANUALES -->
+    
+                </select>
 
-                    <div class="form-group">
+                                </div>
 
-                        <label for="nonManualFeatures">
-                            Rasgos no manuales
-                        </label>
-
-                        <textarea
-                            id="nonManualFeatures"
-                            placeholder="Describe expresiones faciales o movimientos corporales..."
-                        ></textarea>
-
-                    </div>
-
-                </div>
+                <div
+                    id="signTypeOptions"
+                    class="sign-type-options"
+                ></div>
 
 
-                <!-- ACCIONES -->
+
+<!-- ACCIONES -->
 
                 <div class="form-actions">
 
