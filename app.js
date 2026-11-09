@@ -751,6 +751,9 @@ const signDetailNonManualFeatures =
     const signDetailMeaning =
     document.getElementById("signDetailMeaning");
 
+    const signDetailMeaningContainer =
+    document.getElementById("signDetailMeaningContainer");
+
 
 // ========================================
 // CONTROL DE NAVEGACIÓN
@@ -2436,10 +2439,6 @@ vocabularyCard.className = "category-card";
 
 vocabularyCard.innerHTML = `
 
-    <div class="category-icon">
-        📚
-    </div>
-
     <h3>
         Vocabulario
     </h3>
@@ -2493,10 +2492,6 @@ sortedCategories.forEach(category => {
 
 
         card.innerHTML = `
-
-            <div class="category-icon">
-                ${category.icon}
-            </div>
 
             <h3>
                 ${category.name}
@@ -2686,7 +2681,8 @@ function showCategory(categoryId) {
 }
 
 
-//// ========================================
+
+// ========================================
 // CREAR TARJETA DE SEÑA
 // ========================================
 
@@ -2695,55 +2691,7 @@ function createSignCard(sign, category) {
     const card =
         document.createElement("article");
 
-
-    card.className =
-        "sign-card";
-
-
-    // ========================================
-    // BUSCAR EMOJI
-    // ========================================
-
-    const emoji =
-        findEmoji(
-            sign.name
-        );
-
-
-    // ========================================
-    // DETERMINAR QUÉ MOSTRAR
-    // PRIORIDAD:
-    // 1. EMOJI
-    // 2. IMAGEN
-    // 3. NADA
-    // ========================================
-
-    let visualHTML = "";
-
-
-    if (
-        emoji
-    ) {
-
-        visualHTML = `
-            <div class="sign-emoji">
-                ${emoji}
-            </div>
-        `;
-
-    } else if (
-        sign.image
-    ) {
-
-        visualHTML = `
-            <img
-                src="${sign.image}"
-                alt="Seña de ${sign.name}"
-            >
-        `;
-
-    }
-
+    card.className = "sign-card";
 
     // ========================================
     // CONTENIDO DE LA TARJETA
@@ -2751,18 +2699,7 @@ function createSignCard(sign, category) {
 
     card.innerHTML = `
 
-        <div class="sign-image">
-
-            ${visualHTML}
-
-        </div>
-
-
         <div class="sign-info">
-
-            <span class="sign-category">
-                ${category.name}
-            </span>
 
             <h3>
                 ${sign.name}
@@ -2772,7 +2709,6 @@ function createSignCard(sign, category) {
 
     `;
 
-
     // ========================================
     // ABRIR DETALLE
     // ========================================
@@ -2781,19 +2717,14 @@ function createSignCard(sign, category) {
         "click",
         () => {
 
-            previousSignView =
-                "category";
+            previousSignView = "category";
 
-            previousCategoryId =
-                category.id;
+            previousCategoryId = category.id;
 
-            showSignDetail(
-                sign.id
-            );
+            showSignDetail(sign.id);
 
         }
     );
-
 
     return card;
 }
@@ -3157,8 +3088,14 @@ if (movement) {
 // SIGNIFICADO O SINÓNIMOS
 // ========================================
 
-signDetailMeaning.textContent =
-    sign.meaning || "No especificado.";
+const meaning = sign.meaning?.trim();
+
+signDetailMeaning.textContent = meaning || "";
+
+signDetailMeaningContainer.classList.toggle(
+    "hidden",
+    !meaning
+);
 
 // ========================================
 // RASGOS NO MANUALES
@@ -3259,7 +3196,15 @@ backFromCategory.addEventListener(
     "click",
     () => {
 
-        showHomeView();
+        showInternalView();
+
+        categoriesView.classList.remove("hidden");
+        categoryView.classList.add("hidden");
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
 
     }
 );
