@@ -4171,22 +4171,26 @@ if (
 // MOVIMIENTO
 // ========================================
 
+// ========================================
+// MOVIMIENTO
+// ========================================
+
 const movement = sign.movements;
 
+const movementField =
+    document.createElement("div");
+
+movementField.className = "detail-field";
+
+const movementTitle =
+    document.createElement("h3");
+
+movementTitle.textContent = "Movimiento";
+
+const movementContent =
+    document.createElement("p");
+
 if (movement) {
-
-    const movementField =
-        document.createElement("div");
-
-    movementField.className = "detail-field";
-
-    const movementTitle =
-        document.createElement("h3");
-
-    movementTitle.textContent = "Movimiento";
-
-    const movementContent =
-        document.createElement("p");
 
     if (movement.origin && movement.destination) {
 
@@ -4202,6 +4206,11 @@ if (movement) {
 
         movementContent.textContent =
             `Destino: ${movement.destination}`;
+
+    } else {
+
+        movementContent.textContent =
+            "Sin movimiento.";
     }
 
     movementField.appendChild(movementTitle);
@@ -4218,8 +4227,17 @@ if (movement) {
         movementField.appendChild(description);
     }
 
-    signDetailHandDetails.appendChild(movementField);
+} else {
+
+    movementContent.textContent =
+        "Sin movimiento.";
+
+    movementField.appendChild(movementTitle);
+    movementField.appendChild(movementContent);
 }
+
+signDetailHandDetails.appendChild(movementField);
+
 
 // ========================================
 // SIGNIFICADO O SINÓNIMOS
@@ -4239,7 +4257,7 @@ signDetailMeaningContainer.classList.toggle(
 // ========================================
 
 signDetailNonManualFeatures.textContent =
-    sign.nonManualFeatures || "No especificados.";
+    sign.nonManualFeatures || "Sin rasgos no manuales.";
 
 
     // ========================================
@@ -5918,8 +5936,13 @@ sign.orientations =
 sign.locations =
     classificationData.locations;
 
-    sign.movements =
+sign.movements =
     classificationData.movement;
+
+sign.movement =
+    classificationData.movement
+        ? null
+        : "Sin movimiento.";
 
     sign.meaning = classificationData.meaning;
 
@@ -5930,7 +5953,8 @@ sign.orientation =
     classificationData.orientation;
 
 sign.nonManualFeatures =
-    classificationData.nonManualFeatures;
+    classificationData.nonManualFeatures ||
+    "Sin rasgos no manuales.";
 
 
             // Solo reemplazar imagen
@@ -6120,8 +6144,13 @@ category_id:
     movement:
         null,
 
-    nonManualFeatures:
-        classificationData.nonManualFeatures
+    movement: classificationData.movement
+    ? null
+    : "Sin movimiento.",
+
+nonManualFeatures:
+    classificationData.nonManualFeatures ||
+    "Sin rasgos no manuales."
 
 };
 
