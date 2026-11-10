@@ -4175,6 +4175,10 @@ if (
 // MOVIMIENTO
 // ========================================
 
+// ========================================
+// MOVIMIENTO
+// ========================================
+
 const movement = sign.movements;
 
 const movementField =
@@ -4190,33 +4194,39 @@ movementTitle.textContent = "Movimiento";
 const movementContent =
     document.createElement("p");
 
-if (movement) {
+const hasMovementSelection =
+    movement?.origin || movement?.destination;
 
-    if (movement.origin && movement.destination) {
+const hasMovementDescription =
+    movement?.description?.trim();
+
+if (hasMovementSelection || hasMovementDescription) {
+
+    if (hasMovementSelection) {
+
+        const parts = [];
+
+        if (movement.origin) {
+            parts.push(`Origen: ${movement.origin}`);
+        }
+
+        if (movement.destination) {
+            parts.push(`Destino: ${movement.destination}`);
+        }
 
         movementContent.textContent =
-            `Origen: ${movement.origin} → Destino: ${movement.destination}`;
+            parts.join(" → ");
 
-    } else if (movement.origin) {
-
-        movementContent.textContent =
-            `Origen: ${movement.origin}`;
-
-    } else if (movement.destination) {
-
-        movementContent.textContent =
-            `Destino: ${movement.destination}`;
+        movementField.appendChild(movementTitle);
+        movementField.appendChild(movementContent);
 
     } else {
 
-        movementContent.textContent =
-            "Sin movimiento.";
+        movementField.appendChild(movementTitle);
+
     }
 
-    movementField.appendChild(movementTitle);
-    movementField.appendChild(movementContent);
-
-    if (movement.description) {
+    if (hasMovementDescription) {
 
         const description =
             document.createElement("p");
@@ -4225,6 +4235,7 @@ if (movement) {
             movement.description;
 
         movementField.appendChild(description);
+
     }
 
 } else {
@@ -4234,6 +4245,7 @@ if (movement) {
 
     movementField.appendChild(movementTitle);
     movementField.appendChild(movementContent);
+
 }
 
 signDetailHandDetails.appendChild(movementField);
@@ -5940,7 +5952,7 @@ sign.movements =
     classificationData.movement;
 
 sign.movement =
-    classificationData.movement
+    classificationData.movement?.description
         ? null
         : "Sin movimiento.";
 
@@ -6141,12 +6153,10 @@ category_id:
     location:
         null,
 
-    movement:
-        null,
-
-    movement: classificationData.movement
-    ? null
-    : "Sin movimiento.",
+movement:
+    classificationData.movement?.description
+        ? null
+        : "Sin movimiento.",
 
 nonManualFeatures:
     classificationData.nonManualFeatures ||
