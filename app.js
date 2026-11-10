@@ -5767,6 +5767,7 @@ if (signTypeValue === "compuesta") {
     // DEVOLVER DATOS DE CLASIFICACIÓN
     // ========================================
 
+
     return {
         signType: signTypeValue,
         movementType: movementType,
@@ -5792,8 +5793,7 @@ if (signTypeValue === "compuesta") {
                         : "nonManualFeatures"
             ),
 
-        meaning: getValue("meaning")
-    };
+meaning: getValue("signMeaning")    };
 
     
 
