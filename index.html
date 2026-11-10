@@ -764,6 +764,28 @@
 
             </div>
 
+            <!-- NAVEGACIÓN ENTRE SEÑAS -->
+
+<div class="sign-navigation">
+
+    <button
+        type="button"
+        id="previousSignButton"
+        class="sign-navigation-button"
+    >
+        ← Anterior
+    </button>
+
+    <button
+        type="button"
+        id="nextSignButton"
+        class="sign-navigation-button"
+    >
+        Siguiente →
+    </button>
+
+</div>
+
             <div class="sign-detail-actions">
 
     <button
@@ -1016,67 +1038,276 @@
                 ></div>
 
 
+<!-- ACCIONES -->
+
+<div class="form-actions">
+
+    <button
+        type="button"
+        class="cancel-button"
+        id="cancelAdd"
+    >
+        Cancelar
+    </button>
+
+    <button
+        type="submit"
+        class="save-button"
+    >
+        Guardar seña
+    </button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<!-- SERVICE WORKER -->
+
+<script>
+    if ("serviceWorker" in navigator) {
+
+        window.addEventListener(
+            "load",
+            () => {
+
+                navigator.serviceWorker.register(
+                    "./server-worker.js"
+                )
+
+                .then(
+                    registration => {
+
+                        console.log(
+                            "Service Worker registrado:",
+                            registration.scope
+                        );
+
+                    }
+                )
+
+                .catch(
+                    error => {
+
+                        console.error(
+                            "Error registrando Service Worker:",
+                            error
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+    }
+</script>
 
 <!-- ACCIONES -->
 
-                <div class="form-actions">
+<div class="form-actions">
 
-                    <button
-                        type="button"
-                        class="cancel-button"
-                        id="cancelAdd"
-                    >
-                        Cancelar
-                    </button>
+    <button
+        type="button"
+        class="cancel-button"
+        id="cancelAdd"
+    >
+        Cancelar
+    </button>
+
+    <button
+        type="submit"
+        class="save-button"
+    >
+        Guardar seña
+    </button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
 
 
-                    <button
-                        type="submit"
-                        class="save-button"
-                    >
-                        Guardar seña
-                    </button>
+<!-- SUPABASE -->
 
-                </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-            </form>
+
+<!-- SERVICE WORKER -->
+
+<script>
+    if ("serviceWorker" in navigator) {
+
+        window.addEventListener(
+            "load",
+            () => {
+
+                navigator.serviceWorker.register(
+                    "./server-worker.js"
+                )
+
+                .then(
+                    registration => {
+
+                        console.log(
+                            "Service Worker registrado:",
+                            registration.scope
+                        );
+
+                    }
+                )
+
+                .catch(
+                    error => {
+
+                        console.error(
+                            "Error registrando Service Worker:",
+                            error
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+    }
+</script>
+
+
+<!-- MODAL NUEVA CATEGORÍA -->
+
+<!-- MODAL CONFIRMAR ELIMINACIÓN -->
+<div id="deleteConfirmationModal" class="custom-modal hidden">
+
+    <div
+        class="custom-modal-overlay"
+        id="deleteConfirmationOverlay">
+    </div>
+
+    <div class="custom-modal-content">
+
+        <div class="custom-modal-header">
+
+            <h2>Eliminar seña</h2>
+
+            <button
+                type="button"
+                id="closeDeleteConfirmation"
+                class="custom-modal-close">
+                ×
+            </button>
+
+        </div>
+
+        <p id="deleteConfirmationMessage">
+            ¿Seguro que quieres eliminar esta seña?
+        </p>
+
+        <div class="custom-modal-actions">
+
+            <button
+                type="button"
+                id="cancelDeleteConfirmation"
+                class="secondary-button">
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                id="confirmDeleteSign"
+                class="primary-button">
+                Sí, eliminar
+            </button>
 
         </div>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
+</div>
 
-    <script>
-    if ("serviceWorker" in navigator) {
-        window.addEventListener(
-            "load",
-            () => {
-                navigator.serviceWorker.register(
-                    "./server-worker.js"
-                )
-                .then(
-                    registration => {
-                        console.log(
-                            "Service Worker registrado:",
-                            registration.scope
-                        );
-                    }
-                )
-                .catch(
-                    error => {
-                        console.error(
-                            "Error registrando Service Worker:",
-                            error
-                        );
-                    }
-                );
-            }
-        );
-    }
-</script>
+<div id="categoryModal" class="custom-modal hidden">
+
+    <div
+        class="custom-modal-overlay"
+        id="categoryModalOverlay">
+    </div>
+
+    <div class="custom-modal-content">
+
+        <div class="custom-modal-header">
+
+            <h2>Nueva categoría</h2>
+
+            <button
+                type="button"
+                id="closeCategoryModal"
+                class="custom-modal-close">
+                ×
+            </button>
+
+        </div>
+
+        <form id="categoryForm">
+
+            <input
+                type="text"
+                id="categoryNameInput"
+                placeholder="Escribe el nombre..."
+                maxlength="50"
+                autocomplete="off"
+                required
+            >
+
+            <div class="custom-modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelCategoryModal"
+                    class="secondary-button">
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button">
+                    Crear categoría
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ========================================
+     NOTIFICACIONES PERSONALIZADAS
+======================================== -->
+
+<div
+    id="notificationContainer"
+    class="notification-container"
+    aria-live="polite"
+    aria-atomic="true">
+</div>
+
+<!-- APLICACIÓN -->
+
+<script src="app.js"></script>
 
 </body>
-
 </html>

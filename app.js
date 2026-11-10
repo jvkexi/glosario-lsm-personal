@@ -707,8 +707,105 @@ const signDetailView =
 const deleteSignButton =
     document.getElementById("deleteSignButton");
 
+// ========================================
+// MODAL CONFIRMAR ELIMINACIÓN
+// ========================================
+
+const deleteConfirmationModal =
+    document.getElementById("deleteConfirmationModal");
+
+const deleteConfirmationOverlay =
+    document.getElementById("deleteConfirmationOverlay");
+
+const deleteConfirmationMessage =
+    document.getElementById("deleteConfirmationMessage");
+
+const closeDeleteConfirmation =
+    document.getElementById("closeDeleteConfirmation");
+
+const cancelDeleteConfirmation =
+    document.getElementById("cancelDeleteConfirmation");
+
+const confirmDeleteSign =
+    document.getElementById("confirmDeleteSign");
+
+// ========================================
+// ABRIR Y CERRAR CONFIRMACIÓN
+// ========================================
+
+let pendingDeleteSignId = null;
+
+function openDeleteConfirmation(signId) {
+
+    const sign = signs.find(
+        sign => sign.id === signId
+    );
+
+    if (!sign) {
+        return;
+    }
+
+    pendingDeleteSignId = signId;
+
+    deleteConfirmationMessage.textContent =
+        `¿Seguro que quieres eliminar la seña "${sign.name}"?`;
+
+    deleteConfirmationModal.classList.remove("hidden");
+}
+
+function closeDeleteConfirmationModal() {
+
+    deleteConfirmationModal.classList.add("hidden");
+
+    pendingDeleteSignId = null;
+}
+
+closeDeleteConfirmation.addEventListener(
+    "click",
+    closeDeleteConfirmationModal
+);
+
+cancelDeleteConfirmation.addEventListener(
+    "click",
+    closeDeleteConfirmationModal
+);
+
+deleteConfirmationOverlay.addEventListener(
+    "click",
+    closeDeleteConfirmationModal
+);
+
+
+// ========================================
+// CONFIRMAR ELIMINACIÓN
+// ========================================
+
+confirmDeleteSign.addEventListener(
+    "click",
+    async () => {
+
+        const signId = pendingDeleteSignId;
+
+        if (signId === null) {
+            return;
+        }
+
+        closeDeleteConfirmationModal();
+
+        await deleteSign(signId);
+
+    }
+);
+
+
 const backFromSignDetail =
     document.getElementById("backFromSignDetail");
+
+const previousSignButton =
+    document.getElementById("previousSignButton");
+
+const nextSignButton =
+    document.getElementById("nextSignButton");
 
 
 const signDetailCategory =
@@ -768,6 +865,9 @@ const signDetailNonManualFeatures =
 let previousSignView = "category";
 let previousCategoryId = null;
 
+let signNavigationList = [];
+let currentSignIndex = -1;
+
 // Seña que actualmente se está editando
 let editingSignId = null;
 
@@ -800,11 +900,200 @@ const signName =
 const signCategory =
     document.getElementById("signCategory");
 
+    createCustomSelect(signCategory);
+
 const signMeaning =
     document.getElementById("signMeaning");
 
 const signType =
     document.getElementById("signType");
+
+
+// ========================================
+// SELECTOR PERSONALIZADO
+// ========================================
+
+function createCustomSelect(select) {
+
+    if (!select || select.dataset.customized === "true") {
+        return;
+    }
+
+    select.dataset.customized = "true";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "custom-select";
+
+    select.parentNode.insertBefore(wrapper, select);
+
+    wrapper.appendChild(select);
+
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "custom-select-trigger";
+
+    const menu = document.createElement("div");
+    menu.className = "custom-select-menu";
+
+    menu.hidden = true;
+
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(menu);
+
+    function updateSelection() {
+
+        const selectedOption =
+            select.options[select.selectedIndex];
+
+        trigger.textContent =
+            selectedOption
+                ? selectedOption.textContent.trim()
+                : "Selecciona una opción";
+
+        menu.innerHTML = "";
+
+        Array.from(select.options)
+    .filter(option => option.value !== "")
+    .forEach(option => {
+
+            const item = document.createElement("button");
+
+            item.type = "button";
+            item.className = "custom-select-option";
+            item.textContent = option.textContent.trim();
+
+            item.addEventListener("click", () => {
+
+                select.value = option.value;
+
+                select.dispatchEvent(
+                    new Event("change", { bubbles: true })
+                );
+
+                updateSelection();
+
+                menu.hidden = true;
+                wrapper.classList.remove("open");
+
+            });
+
+            menu.appendChild(item);
+
+        });
+
+    }
+
+    trigger.addEventListener("click", () => {
+
+    const isAlreadyOpen =
+        wrapper.classList.contains("open");
+
+    // Cerrar los demás menús
+    document.querySelectorAll(".custom-select.open")
+        .forEach(openWrapper => {
+
+            if (openWrapper !== wrapper) {
+
+                openWrapper.classList.remove("open");
+
+                const openMenu =
+                    openWrapper.querySelector(".custom-select-menu");
+
+                if (openMenu) {
+                    openMenu.hidden = true;
+                }
+
+            }
+
+        });
+
+    // Abrir o cerrar el menú actual
+    wrapper.classList.toggle("open", !isAlreadyOpen);
+
+    menu.hidden = isAlreadyOpen;
+
+});
+
+    select.addEventListener("change", updateSelection);
+
+    updateSelection();
+
+}
+
+// ========================================
+// CERRAR MENÚ AL HACER CLIC FUERA
+// ========================================
+
+document.addEventListener("click", event => {
+
+    if (event.target.closest(".custom-select")) {
+        return;
+    }
+
+    document.querySelectorAll(".custom-select.open")
+        .forEach(wrapper => {
+
+            wrapper.classList.remove("open");
+
+            const menu =
+                wrapper.querySelector(".custom-select-menu");
+
+            if (menu) {
+                menu.hidden = true;
+            }
+
+        });
+
+});
+
+// ========================================
+// DETECTAR SELECTORES DINÁMICOS
+// ========================================
+
+const customSelectObserver = new MutationObserver(
+    mutations => {
+
+        mutations.forEach(mutation => {
+
+            mutation.addedNodes.forEach(node => {
+
+                if (node.nodeType !== 1) {
+                    return;
+                }
+
+                if (node.matches("select")) {
+                    createCustomSelect(node);
+                }
+
+                node.querySelectorAll("select").forEach(
+                    select => createCustomSelect(select)
+                );
+
+            });
+
+        });
+
+    }
+);
+
+customSelectObserver.observe(
+    document.getElementById("signTypeOptions"),
+    {
+        childList: true,
+        subtree: true
+    }
+);
+
+
+// ========================================
+// ACTIVAR SELECTOR TIPO DE SEÑA
+// ========================================
+
+createCustomSelect(signType);
+
+let compoundElementCount = 0;
+let createCompoundElement = null;
+
 
 signType.addEventListener(
     "change",
@@ -953,77 +1242,108 @@ if (signType.value === "bimanual") {
 
         if (bimanualType.value === "simetrica") {
 
-            bimanualOptions.innerHTML = `
+            
+bimanualOptions.innerHTML = `
 
-                <div class="form-group">
+    <div class="form-group">
 
-                    <label for="bimanualReferentRelation">
-                        Relación con el referente
-                    </label>
+        <label for="bimanualReferentRelation">
+            Relación con el referente
+        </label>
 
-                    <select id="bimanualReferentRelation">
+        <select id="bimanualReferentRelation">
 
-                        <option value="">Selecciona una característica</option>
-                        <option value="inicializada">Inicializada</option>
-                        <option value="lexicografica">Lexicográfica</option>
-                        <option value="iconica">Icónica</option>
-                        <option value="natural">Natural</option>
-                        <option value="arbitraria">Arbitraria</option>
+            <option value="">Selecciona una característica</option>
+            <option value="inicializada">Inicializada</option>
+            <option value="lexicografica">Lexicográfica</option>
+            <option value="iconica">Icónica</option>
+            <option value="natural">Natural</option>
+            <option value="arbitraria">Arbitraria</option>
 
-                    </select>
+        </select>
 
-                </div>
+    </div>
 
-                <div class="form-group">
+    <!-- CONFIGURACIÓN MANUAL GENERAL -->
 
-                    <label for="symmetricConfiguration">
-                        Configuración manual
-                    </label>
+    <div class="form-group">
 
-                    <textarea
-                        id="symmetricConfiguration"
-                        placeholder="Describe la configuración de ambas manos..."
-                    ></textarea>
+        <label for="symmetricConfiguration">
+            Configuración manual
+        </label>
 
-                </div>
+        <textarea
+            id="symmetricConfiguration"
+            placeholder="Describe la configuración de ambas manos..."
+        ></textarea>
 
-                <div id="symmetricOrientationSelector"></div>
+    </div>
 
-                <div id="symmetricLocationSelector"></div>
+    <!-- MANO BASE -->
 
-                <!-- MOVIMIENTO -->
+    <div class="form-group">
+        <h3>Mano base</h3>
+    </div>
 
-<div class="form-group">
-    <h3>Movimiento</h3>
-</div>
+    <div id="symmetricBaseOrientationSelector"></div>
 
-<div id="symmetricMovementOrigin"></div>
+    <div id="symmetricBaseLocationSelector"></div>
 
-<div id="symmetricMovementDestination"></div>
+    <!-- MANO DOMINANTE -->
 
-                <div class="form-group">
+    <div class="form-group">
+        <h3>Mano dominante</h3>
+    </div>
 
-                    <label for="nonManualFeatures">
-                        Rasgos no manuales
-                    </label>
+    <div id="symmetricDominantOrientationSelector"></div>
 
-                    <textarea
-                        id="nonManualFeatures"
-                        placeholder="Describe las expresiones faciales o movimientos corporales..."
-                    ></textarea>
+    <div id="symmetricDominantLocationSelector"></div>
 
-                </div>
+    <!-- MOVIMIENTO -->
 
-            `;
+    <div class="form-group">
+        <h3>Movimiento</h3>
+    </div>
 
-            createOrientationSelector(
-                document.getElementById("symmetricOrientationSelector"),
-                "symmetricOrientation"
-            );
+    <div id="symmetricMovementOrigin"></div>
 
-            createLocationSelector(
-    document.getElementById("symmetricLocationSelector"),
-    "symmetricLocation"
+    <div id="symmetricMovementDestination"></div>
+
+    <!-- RASGOS NO MANUALES -->
+
+    <div class="form-group">
+
+        <label for="nonManualFeatures">
+            Rasgos no manuales
+        </label>
+
+        <textarea
+            id="nonManualFeatures"
+            placeholder="Describe las expresiones faciales o movimientos corporales..."
+        ></textarea>
+
+    </div>
+
+`;
+
+createOrientationSelector(
+    document.getElementById("symmetricBaseOrientationSelector"),
+    "symmetricBaseOrientation"
+);
+
+createLocationSelector(
+    document.getElementById("symmetricBaseLocationSelector"),
+    "symmetricBaseLocation"
+);
+
+createOrientationSelector(
+    document.getElementById("symmetricDominantOrientationSelector"),
+    "symmetricDominantOrientation"
+);
+
+createLocationSelector(
+    document.getElementById("symmetricDominantLocationSelector"),
+    "symmetricDominantLocation"
 );
 
 createMovementSelector(
@@ -1037,6 +1357,7 @@ createMovementSelector(
     "symmetricMovementDestinationValue",
     "Punto de destino"
 );
+
 
         }
 
@@ -1183,6 +1504,11 @@ createMovementSelector(
 // SEÑA COMPUESTA
 // ========================================
 
+
+// ========================================
+// SEÑA COMPUESTA
+// ========================================
+
 if (signType.value === "compuesta") {
 
     signTypeOptions.innerHTML = `
@@ -1206,30 +1532,76 @@ if (signType.value === "compuesta") {
 
         </div>
 
+        <!-- SEÑA CONOCIDA INICIAL -->
+
+        <div class="form-group">
+
+            <label for="compoundHasKnownSign">
+                ¿Se usa una seña conocida?
+            </label>
+
+            <select id="compoundHasKnownSign">
+
+                <option value="">Selecciona una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+
+            </select>
+
+        </div>
+
+        <!-- ELEMENTOS DE LA SEÑA COMPUESTA -->
+
+        <div id="compoundElements"></div>
+
+        <!-- AGREGAR COMPONENTES -->
+
         <div class="compound-elements-section">
 
-    <div id="compoundElements"></div>
+    <div class="compound-add-wrapper">
 
-            <button
-                type="button"
-                id="addCompoundElement"
-                class="new-category-button"
-            >
-                ＋ Agregar elemento
+        <button
+            type="button"
+            id="addCompoundElement"
+            class="new-category-button">
+            ＋ Agregar componente
+        </button>
+
+        <div id="compoundComponentMenu" hidden>
+
+            <button type="button" data-type="manual">
+                Seña manual
+            </button>
+
+            <button type="button" data-type="simetrica">
+                Seña bimanual simétrica
+            </button>
+
+            <button type="button" data-type="asimetrica">
+                Seña bimanual asimétrica
+            </button>
+
+            <button type="button" data-type="conocida">
+                Seña conocida
             </button>
 
         </div>
 
+    </div>
 
-        <!-- MOVIMIENTO -->
-
-<div class="form-group">
-    <h3>Movimiento</h3>
 </div>
 
-<div id="compoundMovementOrigin"></div>
+        <!-- MOVIMIENTO GENERAL -->
 
-<div id="compoundMovementDestination"></div>
+        <div class="form-group">
+            <h3>Movimiento</h3>
+        </div>
+
+        <div id="compoundMovementOrigin"></div>
+
+        <div id="compoundMovementDestination"></div>
+
+        <!-- RASGOS NO MANUALES -->
 
         <div class="form-group">
 
@@ -1249,87 +1621,449 @@ if (signType.value === "compuesta") {
     const compoundElements =
         document.getElementById("compoundElements");
 
+    const compoundHasKnownSign =
+        document.getElementById("compoundHasKnownSign");
+
+    const compoundComponentMenu =
+    document.getElementById("compoundComponentMenu");
+
     const addCompoundElement =
         document.getElementById("addCompoundElement");
 
-    let compoundElementCount = 0;
 
-    function addElement() {
+    // ========================================
+    // ACTUALIZAR NUMERACIÓN
+    // ========================================
 
-        compoundElementCount++;
+    function updateCompoundNumbers() {
 
-        const elementNumber = compoundElementCount;
+        const elements =
+            compoundElements.querySelectorAll(
+                ".compound-element"
+            );
 
-        const element = document.createElement("div");
+        elements.forEach((element, index) => {
+
+            const number = index + 1;
+
+            element.dataset.element = number;
+
+            const title =
+                element.querySelector(
+                    ".compound-element-title"
+                );
+
+            if (title) {
+
+                const labels = [
+                    "Primera seña",
+                    "Segunda seña",
+                    "Tercera seña",
+                    "Cuarta seña",
+                    "Quinta seña",
+                    "Sexta seña",
+                    "Séptima seña",
+                    "Octava seña",
+                    "Novena seña",
+                    "Décima seña"
+                ];
+
+                title.textContent =
+                    labels[index] || `Seña ${number}`;
+
+            }
+
+        });
+
+    }
+
+    // ========================================
+    // CREAR SEÑA CONOCIDA
+    // ========================================
+
+    function createKnownSignElement() {
+
+        const element =
+            document.createElement("div");
 
         element.className =
             "compound-element form-group";
 
+        element.dataset.componentType = "conocida";
+
+        element.dataset.initialKnown = "true";
+
         element.innerHTML = `
+
+            <h3 class="compound-element-title">
+                Primera seña
+            </h3>
 
             <div class="form-group">
 
                 <label>
-                    Configuración manual
+                    Describe la seña conocida
                 </label>
 
                 <textarea
-                    class="compound-element-configuration"
-                    placeholder="Describe la configuración de las manos..."
+                    class="compound-element-description"
+                    placeholder="Describe la seña conocida que se realiza primero..."
                 ></textarea>
 
             </div>
 
-            <div class="form-group">
-
-                <div id="compoundOrientation${elementNumber}"></div>
-
-            </div>
-
-            <div id="compoundLocation${elementNumber}"></div>
-
         `;
 
-        compoundElements.appendChild(element);
-
-        createOrientationSelector(
-            document.getElementById(
-                `compoundOrientation${elementNumber}`
-            ),
-            `compoundOrientation${elementNumber}Value`
-        );
-
-        createLocationSelector(
-    document.getElementById(
-        `compoundLocation${elementNumber}`
-    ),
-    `compoundLocation${elementNumber}Value`
-);
-
+        return element;
 
     }
 
-    addElement();
-    addElement();
+    // ========================================
+    // PREGUNTA SOBRE SEÑA CONOCIDA
+    // ========================================
+
+    compoundHasKnownSign.addEventListener(
+        "change",
+        () => {
+
+            const initialKnown =
+                compoundElements.querySelector(
+                    '[data-initial-known="true"]'
+                );
+
+            if (compoundHasKnownSign.value === "si") {
+
+                if (!initialKnown) {
+
+                    compoundElements.prepend(
+                        createKnownSignElement()
+                    );
+
+                }
+
+            } else {
+
+                if (initialKnown) {
+                    initialKnown.remove();
+                }
+
+            }
+
+            updateCompoundNumbers();
+
+        }
+    );
+
+    // ========================================
+    // CREAR COMPONENTE
+    // ========================================
+
+    function addElement(componentType) {
+
+        compoundElementCount++;
+
+        const elementNumber =
+            compoundElementCount;
+
+        const prefix =
+            `compoundElement${elementNumber}`;
+
+        const element =
+            document.createElement("div");
+
+        element.className =
+            "compound-element form-group";
+
+        element.dataset.componentType =
+            componentType;
+
+            element.dataset.prefix = prefix;
+
+        // ========================================
+        // SEÑA MANUAL
+        // ========================================
+
+        if (componentType === "manual") {
+
+            element.innerHTML = `
+
+                <h3 class="compound-element-title"></h3>
+
+                <div class="form-group">
+
+                    <label>
+                        Configuración manual
+                    </label>
+
+                    <textarea
+                        class="compound-element-configuration"
+                        placeholder="Describe la configuración de la mano..."
+                    ></textarea>
+
+                </div>
+
+                <div id="${prefix}OrientationSelector"></div>
+
+                <div id="${prefix}LocationSelector"></div>
+
+            `;
+
+            compoundElements.appendChild(element);
+
+            createOrientationSelector(
+                document.getElementById(
+                    `${prefix}OrientationSelector`
+                ),
+                `${prefix}Orientation`
+            );
+
+            createLocationSelector(
+                document.getElementById(
+                    `${prefix}LocationSelector`
+                ),
+                `${prefix}Location`
+            );
+
+        }
+
+        // ========================================
+        // SEÑA BIMANUAL SIMÉTRICA
+        // ========================================
+
+        if (componentType === "simetrica") {
+
+            element.innerHTML = `
+
+                <h3 class="compound-element-title"></h3>
+
+                <div class="form-group">
+
+                    <label>
+                        Configuración manual compartida
+                    </label>
+
+                    <textarea
+                        class="compound-element-configuration"
+                        placeholder="Describe la configuración de ambas manos..."
+                    ></textarea>
+
+                </div>
+
+                <div class="form-group">
+                    <h3>Mano base</h3>
+                </div>
+
+                <div id="${prefix}BaseOrientationSelector"></div>
+
+                <div id="${prefix}BaseLocationSelector"></div>
+
+                <div class="form-group">
+                    <h3>Mano dominante</h3>
+                </div>
+
+                <div id="${prefix}DominantOrientationSelector"></div>
+
+                <div id="${prefix}DominantLocationSelector"></div>
+
+            `;
+
+            compoundElements.appendChild(element);
+
+            createOrientationSelector(
+                document.getElementById(
+                    `${prefix}BaseOrientationSelector`
+                ),
+                `${prefix}BaseOrientation`
+            );
+
+            createLocationSelector(
+                document.getElementById(
+                    `${prefix}BaseLocationSelector`
+                ),
+                `${prefix}BaseLocation`
+            );
+
+            createOrientationSelector(
+                document.getElementById(
+                    `${prefix}DominantOrientationSelector`
+                ),
+                `${prefix}DominantOrientation`
+            );
+
+            createLocationSelector(
+                document.getElementById(
+                    `${prefix}DominantLocationSelector`
+                ),
+                `${prefix}DominantLocation`
+            );
+
+        }
+
+        // ========================================
+        // SEÑA BIMANUAL ASIMÉTRICA
+        // ========================================
+
+        if (componentType === "asimetrica") {
+
+            element.innerHTML = `
+
+                <h3 class="compound-element-title"></h3>
+
+                <div class="form-group">
+
+                    <label>
+                        Configuración manual
+                    </label>
+
+                    <h3>Mano base</h3>
+
+                    <textarea
+                        class="compound-element-base-configuration"
+                        placeholder="Describe la configuración de la mano base..."
+                    ></textarea>
+
+                </div>
+
+                <div id="${prefix}BaseOrientationSelector"></div>
+
+                <div id="${prefix}BaseLocationSelector"></div>
+
+                <div class="form-group">
+
+                    <h3>Mano dominante</h3>
+
+                    <textarea
+                        class="compound-element-dominant-configuration"
+                        placeholder="Describe la configuración de la mano dominante..."
+                    ></textarea>
+
+                </div>
+
+                <div id="${prefix}DominantOrientationSelector"></div>
+
+                <div id="${prefix}DominantLocationSelector"></div>
+
+            `;
+
+            compoundElements.appendChild(element);
+
+            createOrientationSelector(
+                document.getElementById(
+                    `${prefix}BaseOrientationSelector`
+                ),
+                `${prefix}BaseOrientation`
+            );
+
+            createLocationSelector(
+                document.getElementById(
+                    `${prefix}BaseLocationSelector`
+                ),
+                `${prefix}BaseLocation`
+            );
+
+            createOrientationSelector(
+                document.getElementById(
+                    `${prefix}DominantOrientationSelector`
+                ),
+                `${prefix}DominantOrientation`
+            );
+
+            createLocationSelector(
+                document.getElementById(
+                    `${prefix}DominantLocationSelector`
+                ),
+                `${prefix}DominantLocation`
+            );
+
+        }
+
+        // ========================================
+        // SEÑA CONOCIDA
+        // ========================================
+
+        if (componentType === "conocida") {
+
+            element.innerHTML = `
+
+                <h3 class="compound-element-title"></h3>
+
+                <div class="form-group">
+
+                    <label>
+                        Describe la seña conocida
+                    </label>
+
+                    <textarea
+                        class="compound-element-description"
+                        placeholder="Describe la seña que forma parte de esta composición..."
+                    ></textarea>
+
+                </div>
+
+            `;
+
+            compoundElements.appendChild(element);
+
+        }
+
+        updateCompoundNumbers();
+
+    }
+
+        createCompoundElement = addElement;
+
+    // ========================================
+    // AGREGAR COMPONENTE
+    // ========================================
+
+    addCompoundElement.addEventListener("click", () => {
+
+    compoundComponentMenu.hidden =
+        !compoundComponentMenu.hidden;
+
+});
+
+
+compoundComponentMenu.addEventListener("click", event => {
+
+    const option =
+        event.target.closest("[data-type]");
+
+    if (!option) {
+        return;
+    }
+
+    const selectedType =
+        option.dataset.type;
+
+    addElement(selectedType);
+
+    compoundComponentMenu.hidden = true;
+
+});
+
+    // ========================================
+    // MOVIMIENTO GENERAL
+    // ========================================
 
     createMovementSelector(
-    document.getElementById("compoundMovementOrigin"),
-    "compoundMovementOriginValue",
-    "Punto de origen"
-);
+        document.getElementById(
+            "compoundMovementOrigin"
+        ),
+        "compoundMovementOriginValue",
+        "Punto de origen"
+    );
 
-createMovementSelector(
-    document.getElementById("compoundMovementDestination"),
-    "compoundMovementDestinationValue",
-    "Punto de destino"
-);
-
-    addCompoundElement.addEventListener(
-        "click",
-        addElement
+    createMovementSelector(
+        document.getElementById(
+            "compoundMovementDestination"
+        ),
+        "compoundMovementDestinationValue",
+        "Punto de destino"
     );
 
 }
+
 
     }
 );
@@ -1355,6 +2089,139 @@ const createCategoryButton =
     document.getElementById(
         "createCategoryButton"
     );
+
+
+// ========================================
+// MODAL DE CATEGORÍAS
+// ========================================
+
+const categoryModal =
+    document.getElementById("categoryModal");
+
+const categoryModalOverlay =
+    document.getElementById("categoryModalOverlay");
+
+const categoryNameInput =
+    document.getElementById("categoryNameInput");
+
+const categoryForm =
+    document.getElementById("categoryForm");
+
+const closeCategoryModal =
+    document.getElementById("closeCategoryModal");
+
+const cancelCategoryModal =
+    document.getElementById("cancelCategoryModal");
+
+
+    // ========================================
+// ABRIR Y CERRAR MODAL DE CATEGORÍAS
+// ========================================
+
+function openCategoryModal() {
+
+    categoryModal.classList.remove("hidden");
+
+    categoryNameInput.value = "";
+
+    setTimeout(() => {
+        categoryNameInput.focus();
+    }, 100);
+
+}
+
+
+function closeCategoryModalWindow() {
+
+    categoryModal.classList.add("hidden");
+
+    categoryForm.reset();
+
+}
+
+
+// ========================================
+// EVENTOS DEL MODAL
+// ========================================
+
+createCategoryButton.addEventListener(
+    "click",
+    openCategoryModal
+);
+
+
+closeCategoryModal.addEventListener(
+    "click",
+    closeCategoryModalWindow
+);
+
+
+cancelCategoryModal.addEventListener(
+    "click",
+    closeCategoryModalWindow
+);
+
+
+categoryModalOverlay.addEventListener(
+    "click",
+    closeCategoryModalWindow
+);
+
+
+
+// ========================================
+// SISTEMA DE NOTIFICACIONES
+// ========================================
+
+function showNotification(message, type = "success") {
+
+    const container =
+        document.getElementById("notificationContainer");
+
+    if (!container) {
+        return;
+    }
+
+    const icons = {
+        success: "✓",
+        error: "!",
+        warning: "⚠"
+    };
+
+    const notification =
+        document.createElement("div");
+
+    notification.className =
+        `notification notification-${type}`;
+
+    const icon =
+        document.createElement("div");
+
+    icon.className = "notification-icon";
+    icon.textContent = icons[type] || "✓";
+
+    const messageElement =
+        document.createElement("div");
+
+    messageElement.className = "notification-message";
+    messageElement.textContent = message;
+
+    notification.appendChild(icon);
+    notification.appendChild(messageElement);
+
+    container.appendChild(notification);
+
+    setTimeout(() => {
+
+        notification.classList.add("notification-hide");
+
+        setTimeout(() => {
+            notification.remove();
+        }, 200);
+
+    }, 3500);
+
+}
 
 
 // ========================================
@@ -2413,7 +3280,43 @@ document.querySelectorAll("[data-feature-link]").forEach(button => {
 
 });
 
+// ========================================
+// ORDENAR CATEGORÍAS
+// ========================================
 
+function getSortedCategories() {
+
+    return [...categories].sort((a, b) => {
+
+        const pinnedOrder = [21, 20];
+
+        const indexA =
+            pinnedOrder.indexOf(Number(a.id));
+
+        const indexB =
+            pinnedOrder.indexOf(Number(b.id));
+
+
+        if (indexA !== -1 || indexB !== -1) {
+
+            if (indexA === -1) return 1;
+
+            if (indexB === -1) return -1;
+
+            return indexA - indexB;
+
+        }
+
+
+        return a.name.localeCompare(
+            b.name,
+            "es",
+            { sensitivity: "base" }
+        );
+
+    });
+
+}
 
 // ========================================
 // MOSTRAR CATEGORÍAS
@@ -2423,55 +3326,9 @@ function renderCategories() {
 
     categoriesContainer.innerHTML = "";
 
-    // ========================================
-// CATEGORÍA GENERAL: VOCABULARIO
-// ========================================
+    
 
-const vocabularySigns =
-    signs.filter(
-        sign => sign.categoryId === null
-    );
-
-const vocabularyCard =
-    document.createElement("article");
-
-vocabularyCard.className = "category-card";
-
-vocabularyCard.innerHTML = `
-
-    <h3>
-        Vocabulario
-    </h3>
-
-    <p>
-        ${vocabularySigns.length}
-        ${
-            vocabularySigns.length === 1
-                ? "seña"
-                : "señas"
-        }
-    </p>
-
-`;
-
-vocabularyCard.addEventListener(
-    "click",
-    () => {
-        showCategory(null);
-    }
-);
-
-categoriesContainer.appendChild(
-    vocabularyCard
-);
-
-    const sortedCategories = [...categories].sort((a, b) =>
-    a.name.localeCompare(
-        b.name,
-        "es",
-        { sensitivity: "base" }
-    )
-);
+    const sortedCategories = getSortedCategories();
 
 sortedCategories.forEach(category => {
 
@@ -2599,6 +3456,12 @@ function showCategory(categoryId) {
                     { sensitivity: "base" }
                 )
         );
+
+        // ========================================
+// LISTA DE NAVEGACIÓN DE LA CATEGORÍA
+// ========================================
+
+signNavigationList = [...filteredSigns];
 
 
     categoryTitle.textContent =
@@ -2745,6 +3608,26 @@ function showSignDetail(signId) {
 
     if (!sign) return;
 
+
+    // ========================================
+// POSICIÓN DE LA SEÑA EN LA NAVEGACIÓN
+// ========================================
+
+currentSignIndex = signNavigationList.findIndex(
+    item => item.id === signId
+);
+
+// ========================================
+// ACTIVAR O DESACTIVAR BOTONES
+// ========================================
+
+previousSignButton.disabled =
+    currentSignIndex <= 0;
+
+nextSignButton.disabled =
+    currentSignIndex === -1 ||
+    currentSignIndex >= signNavigationList.length - 1;
+
     signDetailView.dataset.signId =
     signId;
 
@@ -2799,6 +3682,9 @@ const orientations =
     const locations =
     sign.locations || [];
 
+    const components =
+    sign.components || [];
+
 const orientationClasses = {
     dorso_frente: "dark",
     palma_frente: "light",
@@ -2822,80 +3708,129 @@ if (
     totalItems = 1;
 }
 
+// CONFIGURACIÓN MANUAL COMPARTIDA EN SEÑAS SIMÉTRICAS
+
+if (sign.movementType === "simetrica") {
+
+    const configurationField =
+        document.createElement("div");
+
+    configurationField.className = "detail-field";
+
+    const configurationTitle =
+        document.createElement("h3");
+
+    configurationTitle.textContent =
+        "Configuración manual";
+
+    const configurationDescription =
+        document.createElement("p");
+
+    configurationDescription.textContent =
+        configurations[0]?.configuration ||
+        sign.manualConfiguration ||
+        "No especificada.";
+
+    configurationField.appendChild(configurationTitle);
+    configurationField.appendChild(configurationDescription);
+
+    signDetailHandDetails.appendChild(configurationField);
+}
+
 for (let i = 0; i < totalItems; i++) {
 
     const configuration = configurations[i];
     const orientation = orientations[i];
 
-    const location =
-    locations.find(item => {
+    const location = locations.find(item => {
 
-        if (item.role === "ambas") {
-            return true;
+    if (sign.movementType === "simetrica") {
+
+        if (i === 0) {
+            return item.role === "base";
         }
 
-        if (item.role) {
-            return (
-                item.role === configuration?.role
-            );
+        if (i === 1) {
+            return item.role === "dominante";
         }
+    }
 
-        if (item.element) {
-            return (
-                item.element ===
-                (configuration?.element || orientation?.element)
-            );
-        }
+    if (item.role === "ambas") {
+        return true;
+    }
 
-        return item.hand === (i + 1);
+    if (item.role) {
+        return item.role === configuration?.role;
+    }
 
-    });
+    if (item.element) {
+        return (
+            item.element ===
+            (configuration?.element || orientation?.element)
+        );
+    }
+
+    return item.hand === (i + 1);
+});
 
     const handContainer =
         document.createElement("div");
 
     handContainer.className = "detail-hand-item";
 
-    // IDENTIFICAR MANO O ELEMENTO
+ // IDENTIFICAR MANO O ELEMENTO
 
-    let itemName = "";
+let itemName = "";
 
-    if (
-        configuration?.role === "base" ||
-        orientation?.role === "base"
-    ) {
-        itemName = "Mano base";
+if (
+    configuration?.role === "base" ||
+    orientation?.role === "base"
+) {
+    itemName = "Mano base";
 
-    } else if (
-        configuration?.role === "dominante" ||
-        orientation?.role === "dominante"
-    ) {
-        itemName = "Mano dominante";
+} else if (
+    configuration?.role === "dominante" ||
+    orientation?.role === "dominante"
+) {
+    itemName = "Mano dominante";
 
-    } else if (
-        configuration?.element ||
-        orientation?.element
-    ) {
-        itemName =
-            `Configuración ${configuration?.element || orientation?.element}`;
+} else if (
+    configuration?.element ||
+    orientation?.element
+) {
+    itemName =
+        `Configuración ${configuration?.element || orientation?.element}`;
 
-    } else if (sign.signType === "bimanual") {
-        itemName = "Ambas manos";
+} else if (
+    sign.signType === "bimanual" &&
+    sign.movementType === "simetrica"
+) {
+    itemName = i === 0
+        ? "Mano base"
+        : "Mano dominante";
 
-    } else if (sign.signType === "compuesta") {
-        itemName = `Configuración ${i + 1}`;
-    }
+} else if (sign.signType === "bimanual") {
+    itemName = "Ambas manos";
 
-    if (itemName) {
+} else if (sign.signType === "compuesta") {
+    itemName = `Configuración ${i + 1}`;
+}
 
-        const heading = document.createElement("h4");
+if (itemName) {
 
-        heading.textContent = itemName;
+    const heading = document.createElement("h4");
 
-        handContainer.appendChild(heading);
-    }
+    heading.textContent = itemName;
+
+    handContainer.appendChild(heading);
+}
 
     // CUADRANTE: CONFIGURACIÓN MANUAL
+
+// En señas simétricas, mostrar la configuración
+// compartida una sola vez.
+
+if (sign.movementType !== "simetrica") {
 
     const configurationField =
         document.createElement("div");
@@ -2923,6 +3858,7 @@ for (let i = 0; i < totalItems; i++) {
     configurationField.appendChild(configurationDescription);
 
     handContainer.appendChild(configurationField);
+}
 
     // CUADRANTE: ORIENTACIÓN
 
@@ -3131,6 +4067,39 @@ signDetailNonManualFeatures.textContent =
     });
 }
 
+// ========================================
+// NAVEGACIÓN ENTRE SEÑAS
+// ========================================
+
+previousSignButton.addEventListener("click", () => {
+
+    if (currentSignIndex > 0) {
+
+        const previousSign =
+            signNavigationList[currentSignIndex - 1];
+
+        showSignDetail(previousSign.id);
+
+    }
+
+});
+
+
+nextSignButton.addEventListener("click", () => {
+
+    if (
+        currentSignIndex !== -1 &&
+        currentSignIndex < signNavigationList.length - 1
+    ) {
+
+        const nextSign =
+            signNavigationList[currentSignIndex + 1];
+
+        showSignDetail(nextSign.id);
+
+    }
+
+});
 
 // ========================================
 // VOLVER DESDE DETALLE
@@ -3275,12 +4244,16 @@ searchInput.addEventListener("input", () => {
 
         suggestion.addEventListener("click", () => {
 
-            searchSuggestions.innerHTML = "";
-            searchSuggestions.classList.remove("active");
+    searchSuggestions.innerHTML = "";
+    searchSuggestions.classList.remove("active");
 
-            showSignDetail(sign.id);
+    previousSignView = "dictionary";
 
-        });
+    renderDictionary();
+
+    showSignDetail(sign.id);
+
+});
 
         searchSuggestions.appendChild(suggestion);
 
@@ -3352,6 +4325,12 @@ function renderDictionary(
                     }
                 )
         );
+
+        // ========================================
+// LISTA DE NAVEGACIÓN DEL DICCIONARIO
+// ========================================
+
+signNavigationList = [...sortedSigns];
 
 
     const groups = {};
@@ -3584,16 +4563,12 @@ function populateCategorySelect(
     selectedCategoryId = ""
 ) {
 
-    signCategory.innerHTML = `
+    signCategory.innerHTML = "";
 
-    <option value="">
-        Vocabulario (sin categoría)
-    </option>
-
-`;
+const sortedCategories = getSortedCategories();
 
 
-    categories.forEach(category => {
+    sortedCategories.forEach(category => {
 
         const option =
             document.createElement(
@@ -3622,41 +4597,47 @@ function populateCategorySelect(
             selectedCategoryId;
 
     }
-}
 
+    // Actualizar menú personalizado
+signCategory.dispatchEvent(
+    new Event("change")
+);
+}
 
 // ========================================
 // CREAR NUEVA CATEGORÍA
 // ========================================
 
-createCategoryButton.addEventListener(
-    "click",
-    async () => {
+categoryForm.addEventListener(
+    "submit",
+    async event => {
 
-        const categoryName =
-            prompt(
-                "Escribe el nombre de la nueva categoría:"
-            );
-
-
-        if (categoryName === null) {
-            return;
-        }
-
+        event.preventDefault();
 
         const cleanName =
-            categoryName.trim();
+            categoryNameInput.value.trim();
 
+
+        // ========================================
+        // VALIDAR NOMBRE
+        // ========================================
 
         if (!cleanName) {
 
-            alert(
-                "Escribe un nombre para la categoría."
-            );
+            showNotification(
+    "Escribe un nombre para la categoría.",
+    "warning"
+);
+
+            categoryNameInput.focus();
 
             return;
         }
 
+
+        // ========================================
+        // COMPROBAR CATEGORÍAS EXISTENTES
+        // ========================================
 
         const existingCategory =
             categories.find(
@@ -3670,85 +4651,90 @@ createCategoryButton.addEventListener(
 
         if (existingCategory) {
 
-            alert(
-                "Esa categoría ya existe."
-            );
-
+            showNotification(
+    "Esa categoría ya existe.",
+    "warning"
+);
 
             populateCategorySelect(
                 existingCategory.id
             );
 
+            closeCategoryModalWindow();
+
             return;
         }
 
 
-const newCategory = {
+        // ========================================
+        // CREAR CATEGORÍA
+        // ========================================
 
-    id:
-        getNextCategoryId(),
+        const newCategory = {
 
-    name:
-        cleanName,
+            id: getNextCategoryId(),
 
-    icon:
-        getCategoryIcon(
-            cleanName
-        )
+            name: cleanName,
 
-};
+            icon: getCategoryIcon(cleanName)
 
-
-const { error } =
-    await supabaseClient
-        .from("categories")
-        .insert({
-            id: newCategory.id,
-            name: newCategory.name,
-            icon: newCategory.icon
-        });
+        };
 
 
-if (error) {
+        // ========================================
+        // GUARDAR EN SUPABASE
+        // ========================================
 
-    console.error(
-    "Error guardando la seña en Supabase:",
-    error.message,
-    error.details,
-    error.hint,
-    error.code
+        const { error } =
+            await supabaseClient
+                .from("categories")
+                .insert({
+                    id: newCategory.id,
+                    name: newCategory.name,
+                    icon: newCategory.icon
+                });
+
+
+        if (error) {
+
+            console.error(
+                "Error guardando categoría:",
+                error
+            );
+
+            ashowNotification(
+    "No se pudo guardar la categoría.",
+    "error"
 );
 
-    alert(
-        "No se pudo guardar la categoría en Supabase."
-    );
-
-    return;
-}
+            return;
+        }
 
 
-categories.push(
-    newCategory
-);
+        // ========================================
+        // ACTUALIZAR APLICACIÓN
+        // ========================================
 
-saveData();
+        categories.push(newCategory);
 
+        saveData();
 
         renderCategories();
-
 
         populateCategorySelect(
             newCategory.id
         );
 
+        closeCategoryModalWindow();
 
-        alert(
-            `La categoría "${cleanName}" fue creada correctamente.`
-        );
+
+        showNotification(
+    `La categoría "${cleanName}" fue creada correctamente.`,
+    "success"
+);
 
     }
 );
-
 
 // ========================================
 // OBTENER SIGUIENTE ID DE CATEGORÍA
@@ -4052,11 +5038,12 @@ const getMovement = (originId, destinationId) => {
     let movementType = null;
 
     let handConfigurations = [];
-    let orientations = [];
+let orientations = [];
+let locations = [];
 
-    let locations = [];
+let components = [];
 
-    let movementData = null;
+let movementData = null;
 
     let manualConfiguration = "";
     let orientation = "";
@@ -4121,62 +5108,85 @@ movementData = getMovement(
 
         if (movementType === "simetrica") {
 
-            const configuration =
-                getValue("symmetricConfiguration");
+    const configuration = getValue("symmetricConfiguration");
 
-            const selectedOrientation =
-                getOrientation("symmetricOrientation");
+    const baseOrientation =
+        getOrientation("symmetricBaseOrientation");
 
-                const symmetricLocation =
-    getLocation("symmetricLocation");
+    const dominantOrientation =
+        getOrientation("symmetricDominantOrientation");
 
-if (symmetricLocation) {
-    locations.push({
-        hand: 1,
-        role: "ambas",
-        ...symmetricLocation
-    });
+    const baseLocation =
+        getLocation("symmetricBaseLocation");
+
+    const dominantLocation =
+        getLocation("symmetricDominantLocation");
+
+
+    // UBICACIÓN DE CADA MANO
+    if (baseLocation) {
+        locations.push({
+            hand: 1,
+            role: "base",
+            ...baseLocation
+        });
+    }
+
+    if (dominantLocation) {
+        locations.push({
+            hand: 2,
+            role: "dominante",
+            ...dominantLocation
+        });
+    }
+
+
+    // MOVIMIENTO COMPARTIDO
+    movementData = getMovement(
+        "symmetricMovementOriginValue",
+        "symmetricMovementDestinationValue"
+    );
+
+
+    // CONFIGURACIÓN MANUAL COMPARTIDA
+    manualConfiguration = configuration;
+
+    if (configuration) {
+        handConfigurations.push(
+            {
+                hand: 1,
+                role: "base",
+                configuration: configuration
+            },
+            {
+                hand: 2,
+                role: "dominante",
+                configuration: configuration
+            }
+        );
+    }
+
+
+    // ORIENTACIÓN DE CADA MANO
+    orientation =
+        `Mano base: ${baseOrientation || ""}\nMano dominante: ${dominantOrientation || ""}`;
+
+    if (baseOrientation) {
+        orientations.push({
+            hand: 1,
+            role: "base",
+            orientation: baseOrientation
+        });
+    }
+
+    if (dominantOrientation) {
+        orientations.push({
+            hand: 2,
+            role: "dominante",
+            orientation: dominantOrientation
+        });
+    }
 }
-
-movementData = getMovement(
-    "symmetricMovementOriginValue",
-    "symmetricMovementDestinationValue"
-);
-
-            manualConfiguration = configuration;
-            orientation = selectedOrientation || "";
-
-            if (configuration) {
-
-                handConfigurations.push(
-                    {
-                        hand: 1,
-                        configuration: configuration
-                    },
-                    {
-                        hand: 2,
-                        configuration: configuration
-                    }
-                );
-
-            }
-
-            if (selectedOrientation) {
-
-                orientations.push(
-                    {
-                        hand: 1,
-                        orientation: selectedOrientation
-                    },
-                    {
-                        hand: 2,
-                        orientation: selectedOrientation
-                    }
-                );
-
-            }
-
-        }
 
         if (movementType === "asimetrica") {
 
@@ -4261,107 +5271,333 @@ movementData = getMovement(
 
     }
 
-    // ========================================
-    // SEÑA COMPUESTA
-    // ========================================
+// ========================================
+// SEÑA COMPUESTA
+// ========================================
 
-  if (signTypeValue === "compuesta") {
+if (signTypeValue === "compuesta") {
 
     referentRelation =
         getValue("compoundReferentRelation") || null;
 
     movementData = getMovement(
-    "compoundMovementOriginValue",
-    "compoundMovementDestinationValue"
-);
+        "compoundMovementOriginValue",
+        "compoundMovementDestinationValue"
+    );
 
     const elements =
         document.querySelectorAll(".compound-element");
 
     elements.forEach((element, index) => {
 
-        const configuration =
-            element.querySelector(
-                ".compound-element-configuration"
-            )?.value.trim() || "";
+        const elementNumber = index + 1;
 
-        const selectedOrientation =
-            getOrientation(
-                `compoundOrientation${index + 1}Value`
-            );
+        const componentType =
+            element.dataset.componentType;
 
-            const selectedLocation =
-    getLocation(
-        `compoundLocation${index + 1}Value`
-    );
+        const prefix =
+            element.dataset.prefix || "";
 
-if (selectedLocation) {
+        // ========================================
+        // COMPONENTE CON SU INFORMACIÓN
+        // ========================================
 
-    locations.push({
-        element: index + 1,
-        ...selectedLocation
-    });
+        const component = {
+            order: elementNumber,
+            type: componentType
+        };
 
-}
+        // ========================================
+        // SEÑA CONOCIDA
+        // ========================================
 
-        handConfigurations.push({
-            element: index + 1,
-            configuration: configuration
-        });
+        if (componentType === "conocida") {
 
-        if (selectedOrientation) {
+            const description =
+                element.querySelector(
+                    ".compound-element-description"
+                )?.value.trim() || "";
 
-            orientations.push({
-                element: index + 1,
-                orientation: selectedOrientation
+            component.description = description;
+
+            handConfigurations.push({
+                element: elementNumber,
+                type: "conocida",
+                description: description
             });
 
         }
 
+        // ========================================
+        // SEÑA MANUAL
+        // ========================================
+
+        if (componentType === "manual") {
+
+            const configuration =
+                element.querySelector(
+                    ".compound-element-configuration"
+                )?.value.trim() || "";
+
+            const selectedOrientation =
+                getOrientation(`${prefix}Orientation`);
+
+            const selectedLocation =
+                getLocation(`${prefix}Location`);
+
+            component.configuration = configuration;
+            component.orientation = selectedOrientation;
+            component.location = selectedLocation;
+
+            handConfigurations.push({
+                element: elementNumber,
+                type: "manual",
+                configuration: configuration
+            });
+
+            if (selectedOrientation) {
+                orientations.push({
+                    element: elementNumber,
+                    hand: "mano",
+                    orientation: selectedOrientation
+                });
+            }
+
+            if (selectedLocation) {
+                locations.push({
+                    element: elementNumber,
+                    hand: "mano",
+                    ...selectedLocation
+                });
+            }
+
+        }
+
+        // ========================================
+        // SEÑA BIMANUAL SIMÉTRICA
+        // ========================================
+
+        if (componentType === "simetrica") {
+
+            const configuration =
+                element.querySelector(
+                    ".compound-element-configuration"
+                )?.value.trim() || "";
+
+            const baseOrientation =
+                getOrientation(`${prefix}BaseOrientation`);
+
+            const baseLocation =
+                getLocation(`${prefix}BaseLocation`);
+
+            const dominantOrientation =
+                getOrientation(`${prefix}DominantOrientation`);
+
+            const dominantLocation =
+                getLocation(`${prefix}DominantLocation`);
+
+            component.configuration = configuration;
+
+            component.baseOrientation = baseOrientation;
+            component.baseLocation = baseLocation;
+
+            component.dominantOrientation = dominantOrientation;
+            component.dominantLocation = dominantLocation;
+
+            handConfigurations.push({
+                element: elementNumber,
+                type: "simetrica",
+                configuration: configuration
+            });
+
+            if (baseOrientation) {
+                orientations.push({
+                    element: elementNumber,
+                    hand: "base",
+                    orientation: baseOrientation
+                });
+            }
+
+            if (baseLocation) {
+                locations.push({
+                    element: elementNumber,
+                    hand: "base",
+                    ...baseLocation
+                });
+            }
+
+            if (dominantOrientation) {
+                orientations.push({
+                    element: elementNumber,
+                    hand: "dominante",
+                    orientation: dominantOrientation
+                });
+            }
+
+            if (dominantLocation) {
+                locations.push({
+                    element: elementNumber,
+                    hand: "dominante",
+                    ...dominantLocation
+                });
+            }
+
+        }
+
+        // ========================================
+        // SEÑA BIMANUAL ASIMÉTRICA
+        // ========================================
+
+        if (componentType === "asimetrica") {
+
+            const baseConfiguration =
+                element.querySelector(
+                    ".compound-element-base-configuration"
+                )?.value.trim() || "";
+
+            const dominantConfiguration =
+                element.querySelector(
+                    ".compound-element-dominant-configuration"
+                )?.value.trim() || "";
+
+            const baseOrientation =
+                getOrientation(`${prefix}BaseOrientation`);
+
+            const baseLocation =
+                getLocation(`${prefix}BaseLocation`);
+
+            const dominantOrientation =
+                getOrientation(`${prefix}DominantOrientation`);
+
+            const dominantLocation =
+                getLocation(`${prefix}DominantLocation`);
+
+            component.baseConfiguration = baseConfiguration;
+            component.dominantConfiguration = dominantConfiguration;
+
+            component.baseOrientation = baseOrientation;
+            component.baseLocation = baseLocation;
+
+            component.dominantOrientation = dominantOrientation;
+            component.dominantLocation = dominantLocation;
+
+            handConfigurations.push({
+                element: elementNumber,
+                type: "asimetrica",
+                baseConfiguration: baseConfiguration,
+                dominantConfiguration: dominantConfiguration
+            });
+
+            if (baseOrientation) {
+                orientations.push({
+                    element: elementNumber,
+                    hand: "base",
+                    orientation: baseOrientation
+                });
+            }
+
+            if (baseLocation) {
+                locations.push({
+                    element: elementNumber,
+                    hand: "base",
+                    ...baseLocation
+                });
+            }
+
+            if (dominantOrientation) {
+                orientations.push({
+                    element: elementNumber,
+                    hand: "dominante",
+                    orientation: dominantOrientation
+                });
+            }
+
+            if (dominantLocation) {
+                locations.push({
+                    element: elementNumber,
+                    hand: "dominante",
+                    ...dominantLocation
+                });
+            }
+
+        }
+
+        // ========================================
+        // AGREGAR COMPONENTE
+        // ========================================
+
+        components.push(component);
+
     });
+
+    // ========================================
+    // RESUMEN DE CONFIGURACIONES
+    // ========================================
 
     manualConfiguration =
         handConfigurations
-            .map(element =>
-                `Configuración ${element.element}: ${element.configuration}`
-            )
+            .map(item => {
+
+                if (item.type === "conocida") {
+                    return `Seña ${item.element}: ${item.description}`;
+                }
+
+                if (item.type === "asimetrica") {
+                    return (
+                        `Configuración ${item.element} - Mano base: ${item.baseConfiguration}\n` +
+                        `Configuración ${item.element} - Mano dominante: ${item.dominantConfiguration}`
+                    );
+                }
+
+                return (
+                    `Configuración ${item.element}: ${item.configuration || ""}`
+                );
+
+            })
             .join("\n");
 
     orientation =
         orientations
-            .map(element =>
-                `Configuración ${element.element}: ${element.orientation}`
+            .map(item =>
+                `Seña ${item.element} - ${item.hand}: ${item.orientation}`
             )
             .join("\n");
 
 }
 
+    // ========================================
+    // DEVOLVER DATOS DE CLASIFICACIÓN
+    // ========================================
+
     return {
+        signType: signTypeValue,
+        movementType: movementType,
+        referentRelation: referentRelation,
 
-    signType: signTypeValue,
+         components: components,
 
-    meaning: getValue("signMeaning") || null,
+        handConfigurations: handConfigurations,
+        orientations: orientations,
+        locations: locations,
 
-    movementType,
+        movement: movementData,
+
+        manualConfiguration: manualConfiguration,
+        orientation: orientation,
+
+        nonManualFeatures:
+            getValue(
+                signTypeValue === "compuesta"
+                    ? "nonManualFeatures"
+                    : signTypeValue === "manual"
+                        ? "nonManualFeatures"
+                        : "nonManualFeatures"
+            ),
+
+        meaning: getValue("meaning")
+    };
+
     
-    movement: movementData,
-
-    referentRelation,
-
-    handConfigurations,
-
-    orientations,
-
-    locations,
-
-    manualConfiguration,
-
-    orientation,
-
-    nonManualFeatures:
-        getValue("nonManualFeatures")
-
-};
 
 }
 
@@ -4384,7 +5620,7 @@ signForm.addEventListener(
         const categoryId =
     signCategory.value
         ? Number(signCategory.value)
-        : null;
+        : 21;
 
 
         // ========================================
@@ -4393,9 +5629,10 @@ signForm.addEventListener(
 
         if (!name) {
 
-            alert(
-                "Escribe el nombre de la seña."
-            );
+            showNotification(
+    "Escribe el nombre de la seña.",
+    "warning"
+);
 
             signName.focus();
 
@@ -4421,9 +5658,10 @@ signForm.addEventListener(
 
         if (existingSign) {
 
-            alert(
-                "Ya existe una seña con ese nombre."
-            );
+            showNotification(
+    "Ya existe una seña con ese nombre.",
+    "warning"
+);
 
             return;
         }
@@ -4461,9 +5699,10 @@ let image = null;
 
             if (!sign) {
 
-                alert(
-                    "No se encontró la seña que quieres editar."
-                );
+                showNotification(
+    "No se encontró la seña que quieres editar.",
+    "error"
+);
 
                 return;
             }
@@ -4487,6 +5726,8 @@ sign.movementType =
 
 sign.referentRelation =
     classificationData.referentRelation;
+
+    sign.components = classificationData.components;
 
 sign.handConfigurations =
     classificationData.handConfigurations;
@@ -4554,6 +5795,8 @@ category_id:
     referent_relation:
         sign.referentRelation || null,
 
+        components: sign.components || [],
+
     hand_configurations:
         sign.handConfigurations.length > 0
             ? sign.handConfigurations
@@ -4616,9 +5859,10 @@ category_id:
                     error
                 );
 
-                alert(
-                    "No se pudo actualizar la seña en Supabase."
-                );
+                showNotification(
+    "No se pudo actualizar la seña.",
+    "error"
+);
 
                 return;
             }
@@ -4631,9 +5875,10 @@ category_id:
             saveData();
 
 
-            alert(
-                `La seña "${name}" fue actualizada correctamente.`
-            );
+            showNotification(
+    `La seña "${name}" fue actualizada correctamente.`,
+    "success"
+);
 
         } else {
 
@@ -4668,6 +5913,8 @@ category_id:
 
     referentRelation:
         classificationData.referentRelation,
+
+    components: classificationData.components,
 
     handConfigurations:
         classificationData.handConfigurations,
@@ -4713,6 +5960,7 @@ category_id: newSign.categoryId,
     sign_type: newSign.signType || null,
     movement_type: newSign.movementType || null,
     referent_relation: newSign.referentRelation || null,
+    components: newSign.components || [],
 
     hand_configurations:
         newSign.handConfigurations.length > 0
@@ -4764,9 +6012,10 @@ category_id: newSign.categoryId,
                     error
                 );
 
-                alert(
-                    "No se pudo guardar la seña en Supabase."
-                );
+                showNotification(
+    "No se pudo guardar la seña.",
+    "error"
+);
 
                 return;
             }
@@ -4790,9 +6039,10 @@ category_id: newSign.categoryId,
             );
 
 
-            alert(
-                `La seña "${name}" fue guardada correctamente.`
-            );
+            showNotification(
+    `La seña "${name}" fue guardada correctamente.`,
+    "success"
+);
 
         }
 
@@ -4932,6 +6182,7 @@ async function loadDataFromSupabase() {
 
                 referentRelation:
                     sign.referent_relation,
+                components: sign.components || [],
 
                 handConfigurations:
     sign.hand_configurations,
@@ -5065,6 +6316,8 @@ function editSign(signId) {
     const locations =
     sign.locations || [];
 
+    const components = sign.components || [];
+
     // ========================================
     // SEÑA MANUAL
     // ========================================
@@ -5126,38 +6379,71 @@ restoreMovement(
 
         document.getElementById("bimanualReferentRelation").value =
             sign.referentRelation || "";
+// ------------------------------------
+// SIMÉTRICA
+// ------------------------------------
 
-        // ------------------------------------
-        // SIMÉTRICA
-        // ------------------------------------
+if (sign.movementType === "simetrica") {
 
-        if (sign.movementType === "simetrica") {
+    // CONFIGURACIÓN MANUAL COMPARTIDA
+    document.getElementById("symmetricConfiguration").value =
+        configurations[0]?.configuration ||
+        sign.manualConfiguration || "";
 
-            document.getElementById("symmetricConfiguration").value =
-                configurations[0]?.configuration ||
-                sign.manualConfiguration || "";
 
-            restoreOrientation(
-                "symmetricOrientation",
-                orientations[0]?.orientation ||
-                sign.orientation || ""
-            );
+    // ORIENTACIÓN DE CADA MANO
+    const baseOrientation =
+        orientations.find(item => item.role === "base");
 
-            const symmetricLocation =
-    locations.find(item => item.role === "ambas");
+    const dominantOrientation =
+        orientations.find(item => item.role === "dominante");
 
-restoreLocation(
-    "symmetricLocation",
-    symmetricLocation
-);
+    // Compatibilidad con señas simétricas anteriores
+    const legacyOrientation =
+        orientations.find(item => !item.role)?.orientation ||
+        sign.orientation || "";
 
-restoreMovement(
-    "symmetricMovementOriginValue",
-    "symmetricMovementDestinationValue",
-    sign.movements
-);
+    restoreOrientation(
+        "symmetricBaseOrientation",
+        baseOrientation?.orientation || legacyOrientation
+    );
 
-        }
+    restoreOrientation(
+        "symmetricDominantOrientation",
+        dominantOrientation?.orientation || legacyOrientation
+    );
+
+
+    // UBICACIÓN DE CADA MANO
+    const baseLocation =
+        locations.find(item => item.role === "base");
+
+    const dominantLocation =
+        locations.find(item => item.role === "dominante");
+
+    // Compatibilidad con señas simétricas anteriores
+    const legacyLocation =
+        locations.find(item => item.role === "ambas");
+
+    restoreLocation(
+        "symmetricBaseLocation",
+        baseLocation || legacyLocation
+    );
+
+    restoreLocation(
+        "symmetricDominantLocation",
+        dominantLocation || legacyLocation
+    );
+
+
+    // MOVIMIENTO COMPARTIDO
+    restoreMovement(
+        "symmetricMovementOriginValue",
+        "symmetricMovementDestinationValue",
+        sign.movements
+    );
+
+}
 
         // ------------------------------------
         // ASIMÉTRICA
@@ -5229,74 +6515,179 @@ restoreMovement(
         }
     }
 
+  // ========================================
+// SEÑA COMPUESTA
+// ========================================
+
+if (signType.value === "compuesta") {
+
+    document.getElementById("compoundReferentRelation").value =
+        sign.referentRelation || "";
+
+
     // ========================================
-    // SEÑA COMPUESTA
+    // LIMPIAR COMPONENTES ANTERIORES
     // ========================================
 
-    if (signType.value === "compuesta") {
+    const compoundContainer =
+        document.getElementById("compoundElements");
 
-        document.getElementById("compoundReferentRelation").value =
-            sign.referentRelation || "";
+    compoundContainer.innerHTML = "";
 
-        const compoundElements =
-            document.querySelectorAll(".compound-element");
+    compoundElementCount = 0;
 
-        // Agregar los elementos que hagan falta
 
-        const addButton =
-            document.getElementById("addCompoundElement");
+    // ========================================
+    // RECONSTRUIR COMPONENTES GUARDADOS
+    // ========================================
 
-        while (
-            document.querySelectorAll(".compound-element").length <
-            configurations.length
-        ) {
-            addButton.click();
+    components.forEach(component => {
+
+        createCompoundElement(
+            component.type
+        );
+
+    });
+
+
+    // ========================================
+    // RESTAURAR DATOS DE CADA COMPONENTE
+    // ========================================
+
+    components.forEach((component, index) => {
+
+        const element =
+            compoundContainer.querySelectorAll(
+                ".compound-element"
+            )[index];
+
+        if (!element) {
+            return;
         }
 
-        const elements =
-            document.querySelectorAll(".compound-element");
+        const prefix =
+            element.dataset.prefix;
 
-        elements.forEach((element, index) => {
 
-            const configuration =
-                configurations[index];
+        // ========================================
+        // COMPONENTE MANUAL
+        // ========================================
 
-            if (!configuration) {
-                return;
-            }
+        if (component.type === "manual") {
 
             element.querySelector(
-    ".compound-element-configuration"
-).value = configuration.configuration || "";
-
-            const elementOrientation =
-                orientations.find(
-                    item => item.element === index + 1
-                );
+                ".compound-element-configuration"
+            ).value = component.configuration || "";
 
             restoreOrientation(
-                `compoundOrientation${index + 1}Value`,
-                elementOrientation?.orientation || ""
+                `${prefix}Orientation`,
+                component.orientation || ""
             );
 
-            const elementLocation =
-    locations.find(
-        item => item.element === index + 1
+            restoreLocation(
+                `${prefix}Location`,
+                component.location
+            );
+
+        }
+
+
+        // ========================================
+        // COMPONENTE SIMÉTRICO
+        // ========================================
+
+        if (component.type === "simetrica") {
+
+            element.querySelector(
+                ".compound-element-configuration"
+            ).value = component.configuration || "";
+
+            restoreOrientation(
+                `${prefix}BaseOrientation`,
+                component.baseOrientation || ""
+            );
+
+            restoreLocation(
+                `${prefix}BaseLocation`,
+                component.baseLocation
+            );
+
+            restoreOrientation(
+                `${prefix}DominantOrientation`,
+                component.dominantOrientation || ""
+            );
+
+            restoreLocation(
+                `${prefix}DominantLocation`,
+                component.dominantLocation
+            );
+
+        }
+
+
+        // ========================================
+        // COMPONENTE ASIMÉTRICO
+        // ========================================
+
+        if (component.type === "asimetrica") {
+
+            element.querySelector(
+                ".compound-element-base-configuration"
+            ).value = component.baseConfiguration || "";
+
+            element.querySelector(
+                ".compound-element-dominant-configuration"
+            ).value = component.dominantConfiguration || "";
+
+            restoreOrientation(
+                `${prefix}BaseOrientation`,
+                component.baseOrientation || ""
+            );
+
+            restoreLocation(
+                `${prefix}BaseLocation`,
+                component.baseLocation
+            );
+
+            restoreOrientation(
+                `${prefix}DominantOrientation`,
+                component.dominantOrientation || ""
+            );
+
+            restoreLocation(
+                `${prefix}DominantLocation`,
+                component.dominantLocation
+            );
+
+        }
+
+
+        // ========================================
+        // COMPONENTE DE SEÑA CONOCIDA
+        // ========================================
+
+        if (component.type === "conocida") {
+
+            element.querySelector(
+                ".compound-element-description"
+            ).value = component.description || "";
+
+        }
+
+    });
+
+
+    // ========================================
+    // RESTAURAR MOVIMIENTO
+    // ========================================
+
+    restoreMovement(
+        "compoundMovementOriginValue",
+        "compoundMovementDestinationValue",
+        sign.movements
     );
 
-restoreLocation(
-    `compoundLocation${index + 1}Value`,
-    elementLocation
-);
-
-        });
-
-        restoreMovement(
-    "compoundMovementOriginValue",
-    "compoundMovementDestinationValue",
-    sign.movements
-);
-    }
+}
 
     // ========================================
     // RASGOS NO MANUALES
@@ -5345,15 +6736,7 @@ async function deleteSign(signId) {
     // CONFIRMAR ELIMINACIÓN
     // ========================================
 
-    const confirmed =
-        confirm(
-            `¿Seguro que quieres eliminar la seña "${sign.name}"?`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
+    
 
 
     // ========================================
@@ -5374,9 +6757,10 @@ if (error) {
         error
     );
 
-    alert(
-        "No se pudo eliminar la seña de Supabase."
-    );
+    showNotification(
+    "No se pudo eliminar la seña. Inténtalo de nuevo.",
+    "error"
+);
 
     return;
 }
@@ -5409,9 +6793,10 @@ saveData();
     renderCategories();
 
 
-    alert(
-        `La seña "${sign.name}" fue eliminada correctamente.`
-    );
+    showNotification(
+    `La seña "${sign.name}" fue eliminada correctamente.`,
+    "success"
+);
 
 
     // ========================================
@@ -5486,7 +6871,7 @@ deleteSignButton.addEventListener(
                 signDetailView.dataset.signId
             );
 
-        deleteSign(signId);
+        openDeleteConfirmation(signId);
 
     }
 );
@@ -5615,7 +7000,6 @@ function createOrientationSelector(
     }
 
 }
-
 // ========================================
 // RESTAURAR ORIENTACIÓN
 // ========================================
@@ -5640,7 +7024,7 @@ function restoreOrientation(inputId, orientationValue) {
 
     const selectedOption =
         container.querySelector(
-            `[data-orientation="${orientationValue}"]`
+            `[data-orientation="${CSS.escape(orientationValue)}"]`
         );
 
     if (selectedOption) {
@@ -5648,7 +7032,6 @@ function restoreOrientation(inputId, orientationValue) {
     }
 
 }
-
 
 // ========================================
 // RESTAURAR UBICACIÓN
