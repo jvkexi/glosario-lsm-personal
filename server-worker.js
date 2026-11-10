@@ -1,4 +1,4 @@
-const CACHE_NAME = "glosario-lsm-v131";
+const CACHE_NAME = "glosario-lsm-v132";
 
 const FILES_TO_CACHE = [
     "./",
