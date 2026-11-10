@@ -2225,6 +2225,167 @@ function showNotification(message, type = "success") {
 
 
 // ========================================
+// HISTORIAL DE NAVEGACIÓN
+// ========================================
+
+let currentAppView = "home";
+
+let isHandlingPopState = false;
+
+function navigateToAppView(view) {
+
+    if (isHandlingPopState) {
+        currentAppView = view;
+        return;
+    }
+
+    if (currentAppView === view) {
+        return;
+    }
+
+    const state = {
+        appView: view,
+        categoryId: view === "category"
+            ? previousCategoryId
+            : null,
+        signId: view === "signDetail"
+            ? Number(signDetailView.dataset.signId) || null
+            : null
+    };
+
+    history.pushState(
+        state,
+        "",
+        window.location.href
+    );
+
+    currentAppView = view;
+
+}
+
+// ========================================
+// INICIAR HISTORIAL DE LA APLICACIÓN
+// ========================================
+
+history.replaceState(
+    {
+        appView: "home",
+        categoryId: null,
+        signId: null
+    },
+    "",
+    window.location.href
+);
+
+
+// ========================================
+// DETECTAR BOTÓN ATRÁS DEL CELULAR
+// ========================================
+
+window.addEventListener("popstate", event => {
+
+    const previousView =
+        event.state?.appView || "home";
+
+    isHandlingPopState = true;
+
+    currentAppView = previousView;
+
+    switch (previousView) {
+
+        case "home":
+
+            showHomeView();
+
+            break;
+
+        case "explore":
+
+            showInternalView();
+
+            exploreView.classList.remove("hidden");
+
+            navHome.classList.remove("active");
+            navExplore.classList.add("active");
+
+            break;
+
+        case "categories":
+
+            showInternalView();
+
+            categoriesView.classList.remove("hidden");
+
+            break;
+
+        case "category":
+
+            const categoryId =
+                event.state?.categoryId ?? previousCategoryId;
+
+            if (categoryId !== null) {
+                showCategory(categoryId);
+            }
+
+            break;
+
+        case "dictionary":
+
+            showInternalView();
+
+            categoryView.classList.add("hidden");
+            signDetailView.classList.add("hidden");
+            dictionaryView.classList.remove("hidden");
+
+            renderDictionary(signs);
+
+            break;
+
+        case "signTypes":
+
+            showInternalView();
+
+            signTypesView.classList.remove("hidden");
+
+            break;
+
+                    case "featureInfo":
+
+            showInternalView();
+
+            featureInfoView.classList.remove("hidden");
+
+            break;
+
+                    case "grammar":
+
+            showInternalView();
+
+            grammarView.classList.remove("hidden");
+
+            break;
+
+        case "signDetail":
+
+            showSignDetail(
+                Number(event.state?.signId)
+            );
+
+            break;
+
+    }
+
+    isHandlingPopState = false;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+});
+
+
+// ========================================
 // CAMBIAR A VISTA INTERNA
 // ========================================
 
@@ -2291,10 +2452,26 @@ function showHomeView() {
 ======================================== */
 
 navHome.addEventListener("click", () => {
+
+    history.replaceState(
+        {
+            appView: "home",
+            categoryId: null,
+            signId: null
+        },
+        "",
+        window.location.href
+    );
+
+    currentAppView = "home";
+
     showHomeView();
+
 });
 
 navExplore.addEventListener("click", () => {
+
+    navigateToAppView("explore");
 
     showInternalView();
 
@@ -2319,6 +2496,8 @@ navExplore.addEventListener("click", () => {
 
 openCategories.addEventListener("click", () => {
 
+    navigateToAppView("categories");
+
     showInternalView();
 
     categoriesView.classList.remove("hidden");
@@ -2333,7 +2512,9 @@ openCategories.addEventListener("click", () => {
 });
 
 backFromCategories.addEventListener("click", () => {
-    showHomeView();
+
+    history.back();
+
 });
 
 
@@ -2343,8 +2524,9 @@ backFromCategories.addEventListener("click", () => {
 
 openSignTypes.addEventListener("click", () => {
 
-    showInternalView();
+    navigateToAppView("signTypes");
 
+    showInternalView();
 
     signTypesView.classList.remove("hidden");
 
@@ -2356,7 +2538,9 @@ openSignTypes.addEventListener("click", () => {
 });
 
 backFromSignTypes.addEventListener("click", () => {
-    showHomeView();
+
+    history.back();
+
 });
 
 
@@ -3214,6 +3398,8 @@ openCharacteristics.addEventListener("click", () => {
 
     });
 
+        navigateToAppView("featureInfo");
+
     showInternalView();
 
     featureInfoView.classList.remove("hidden");
@@ -3227,7 +3413,7 @@ openCharacteristics.addEventListener("click", () => {
 
 
 backFromFeature.addEventListener("click", () => {
-    showHomeView();
+    history.back();
 });
 
 
@@ -3236,6 +3422,8 @@ backFromFeature.addEventListener("click", () => {
 ======================================== */
 
 openGrammar.addEventListener("click", () => {
+
+    navigateToAppView("grammar");
 
     showInternalView();
 
@@ -3251,7 +3439,7 @@ openGrammar.addEventListener("click", () => {
 });
 
 backFromGrammar.addEventListener("click", () => {
-    showHomeView();
+    history.back();
 });
 
 
@@ -3514,7 +3702,6 @@ signNavigationList = [...filteredSigns];
 
     }
 
-
     showInternalView();
 
 
@@ -3533,9 +3720,23 @@ signNavigationList = [...filteredSigns];
 
     // Guardamos la categoría actual
 
-    previousCategoryId =
-        categoryId;
+previousCategoryId = categoryId;
 
+if (!isHandlingPopState) {
+
+    navigateToAppView("category");
+
+    history.replaceState(
+        {
+            ...history.state,
+            appView: "category",
+            categoryId: categoryId
+        },
+        "",
+        window.location.href
+    );
+
+}
 
     window.scrollTo({
         top: 0,
@@ -4045,8 +4246,11 @@ signDetailNonManualFeatures.textContent =
     // CAMBIAR DE VISTA
     // ========================================
 
-    showInternalView();
+if (!isHandlingPopState) {
+    navigateToAppView("signDetail");
+}
 
+showInternalView();
 
     categoryView.classList.add(
         "hidden"
@@ -4078,7 +4282,20 @@ previousSignButton.addEventListener("click", () => {
         const previousSign =
             signNavigationList[currentSignIndex - 1];
 
+        signDetailView.dataset.signId =
+            previousSign.id;
+
         showSignDetail(previousSign.id);
+
+        history.replaceState(
+            {
+                ...history.state,
+                appView: "signDetail",
+                signId: previousSign.id
+            },
+            "",
+            window.location.href
+        );
 
     }
 
@@ -4095,12 +4312,24 @@ nextSignButton.addEventListener("click", () => {
         const nextSign =
             signNavigationList[currentSignIndex + 1];
 
+        signDetailView.dataset.signId =
+            nextSign.id;
+
         showSignDetail(nextSign.id);
+
+        history.replaceState(
+            {
+                ...history.state,
+                appView: "signDetail",
+                signId: nextSign.id
+            },
+            "",
+            window.location.href
+        );
 
     }
 
 });
-
 // ========================================
 // VOLVER DESDE DETALLE
 // ========================================
@@ -4109,49 +4338,7 @@ backFromSignDetail.addEventListener(
     "click",
     () => {
 
-        if (
-            previousSignView ===
-            "dictionary"
-        ) {
-
-            showInternalView();
-
-            categoryView.classList.add(
-                "hidden"
-            );
-
-            signDetailView.classList.add(
-                "hidden"
-            );
-
-            dictionaryView.classList.remove(
-                "hidden"
-            );
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-
-            return;
-        }
-
-
-        if (
-            previousSignView ===
-            "category" &&
-            previousCategoryId !== null
-        ) {
-
-            showCategory(
-                previousCategoryId
-            );
-
-            return;
-        }
-
-
-        showHomeView();
+        history.back();
 
     }
 );
@@ -4165,15 +4352,7 @@ backFromCategory.addEventListener(
     "click",
     () => {
 
-        showInternalView();
-
-        categoriesView.classList.remove("hidden");
-        categoryView.classList.add("hidden");
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        history.back();
 
     }
 );
@@ -4247,9 +4426,7 @@ searchInput.addEventListener("input", () => {
     searchSuggestions.innerHTML = "";
     searchSuggestions.classList.remove("active");
 
-    previousSignView = "dictionary";
-
-    renderDictionary();
+    previousSignView = "explore";
 
     showSignDetail(sign.id);
 
@@ -4476,6 +4653,10 @@ openDictionary.addEventListener(
     "click",
     () => {
 
+if (!isHandlingPopState) {
+    navigateToAppView("dictionary");
+}
+
         showInternalView();
 
 
@@ -4549,11 +4730,10 @@ backFromDictionary.addEventListener(
     "click",
     () => {
 
-        showHomeView();
+        history.back();
 
     }
 );
-
 
 // ========================================
 // SELECT DE CATEGORÍAS
@@ -6731,14 +6911,6 @@ async function deleteSign(signId) {
         return;
     }
 
-
-    // ========================================
-    // CONFIRMAR ELIMINACIÓN
-    // ========================================
-
-    
-
-
     // ========================================
     // ELIMINAR SEÑA
     // ========================================
@@ -6803,46 +6975,67 @@ saveData();
     // REGRESAR A LA VISTA ANTERIOR
     // ========================================
 
-    if (
-        previousSignView ===
-        "dictionary"
-    ) {
+    if (previousSignView === "dictionary") {
+
+        history.replaceState(
+            {
+                appView: "dictionary",
+                categoryId: null,
+                signId: null
+            },
+            "",
+            window.location.href
+        );
+
+        currentAppView = "dictionary";
 
         showInternalView();
 
-        categoryView.classList.add(
-            "hidden"
-        );
+        categoryView.classList.add("hidden");
+        signDetailView.classList.add("hidden");
 
-        signDetailView.classList.add(
-            "hidden"
-        );
+        dictionaryView.classList.remove("hidden");
 
-        dictionaryView.classList.remove(
-            "hidden"
-        );
-
-        renderDictionary(
-            signs
-        );
+        renderDictionary(signs);
 
         return;
     }
 
 
     if (
-        previousSignView ===
-        "category" &&
+        previousSignView === "category" &&
         previousCategoryId !== null
     ) {
 
-        showCategory(
-            previousCategoryId
+        history.replaceState(
+            {
+                appView: "category",
+                categoryId: previousCategoryId,
+                signId: null
+            },
+            "",
+            window.location.href
         );
+
+        currentAppView = "category";
+
+        showCategory(previousCategoryId);
 
         return;
     }
 
+
+    history.replaceState(
+        {
+            appView: "home",
+            categoryId: null,
+            signId: null
+        },
+        "",
+        window.location.href
+    );
+
+    currentAppView = "home";
 
     showHomeView();
 
