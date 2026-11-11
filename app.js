@@ -1279,16 +1279,6 @@ bimanualOptions.innerHTML = `
 
     </div>
 
-    <!-- MANO BASE -->
-
-    <div class="form-group">
-        <h3>Mano base</h3>
-    </div>
-
-    <div id="symmetricBaseOrientationSelector"></div>
-
-    <div id="symmetricBaseLocationSelector"></div>
-
     <!-- MANO DOMINANTE -->
 
     <div class="form-group">
@@ -1298,6 +1288,16 @@ bimanualOptions.innerHTML = `
     <div id="symmetricDominantOrientationSelector"></div>
 
     <div id="symmetricDominantLocationSelector"></div>
+
+    <!-- MANO BASE -->
+
+    <div class="form-group">
+        <h3>Mano base</h3>
+    </div>
+
+    <div id="symmetricBaseOrientationSelector"></div>
+
+    <div id="symmetricBaseLocationSelector"></div>
 
     <!-- MOVIMIENTO -->
 
@@ -1384,31 +1384,6 @@ createMovementSelector(
 
         </div>
 
-        <!-- MANO BASE -->
-
-        <div class="form-group">
-
-            <h3>Configuración manual</h3>
-
-            <label for="baseHandConfiguration">
-                Mano base
-            </label>
-
-            <textarea
-                id="baseHandConfiguration"
-                placeholder="Describe la configuración de la mano base..."
-            ></textarea>
-
-        </div>
-
-        <div class="form-group">
-
-            <div id="baseHandOrientationSelector"></div>
-
-        </div>
-
-        <div id="baseHandLocationSelector"></div>
-
         <!-- MANO DOMINANTE -->
 
         <div class="form-group">
@@ -1433,6 +1408,31 @@ createMovementSelector(
         </div>
 
         <div id="dominantHandLocationSelector"></div>
+
+        <!-- MANO BASE -->
+
+        <div class="form-group">
+
+            <h3>Configuración manual</h3>
+
+            <label for="baseHandConfiguration">
+                Mano base
+            </label>
+
+            <textarea
+                id="baseHandConfiguration"
+                placeholder="Describe la configuración de la mano base..."
+            ></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <div id="baseHandOrientationSelector"></div>
+
+        </div>
+
+        <div id="baseHandLocationSelector"></div>
 
         <!-- MOVIMIENTO -->
 
@@ -1850,20 +1850,20 @@ if (signType.value === "compuesta") {
                 </div>
 
                 <div class="form-group">
-                    <h3>Mano base</h3>
-                </div>
-
-                <div id="${prefix}BaseOrientationSelector"></div>
-
-                <div id="${prefix}BaseLocationSelector"></div>
-
-                <div class="form-group">
                     <h3>Mano dominante</h3>
                 </div>
 
                 <div id="${prefix}DominantOrientationSelector"></div>
 
                 <div id="${prefix}DominantLocationSelector"></div>
+
+                <div class="form-group">
+                    <h3>Mano base</h3>
+                </div>
+
+                <div id="${prefix}BaseOrientationSelector"></div>
+
+                <div id="${prefix}BaseLocationSelector"></div>
 
             `;
 
@@ -1907,28 +1907,15 @@ if (signType.value === "compuesta") {
 
             element.innerHTML = `
 
-                <h3 class="compound-element-title"></h3>
+                                <h3 class="compound-element-title"></h3>
+
+                <!-- MANO DOMINANTE -->
 
                 <div class="form-group">
 
                     <label>
                         Configuración manual
                     </label>
-
-                    <h3>Mano base</h3>
-
-                    <textarea
-                        class="compound-element-base-configuration"
-                        placeholder="Describe la configuración de la mano base..."
-                    ></textarea>
-
-                </div>
-
-                <div id="${prefix}BaseOrientationSelector"></div>
-
-                <div id="${prefix}BaseLocationSelector"></div>
-
-                <div class="form-group">
 
                     <h3>Mano dominante</h3>
 
@@ -1942,6 +1929,23 @@ if (signType.value === "compuesta") {
                 <div id="${prefix}DominantOrientationSelector"></div>
 
                 <div id="${prefix}DominantLocationSelector"></div>
+
+                <!-- MANO BASE -->
+
+                <div class="form-group">
+
+                    <h3>Mano base</h3>
+
+                    <textarea
+                        class="compound-element-base-configuration"
+                        placeholder="Describe la configuración de la mano base..."
+                    ></textarea>
+
+                </div>
+
+                <div id="${prefix}BaseOrientationSelector"></div>
+
+                <div id="${prefix}BaseLocationSelector"></div>
 
             `;
 
@@ -3897,6 +3901,12 @@ const orientationClasses = {
 
 signDetailHandDetails.innerHTML = "";
 
+const locationDetailsContainer =
+    document.createElement("div");
+
+locationDetailsContainer.className =
+    "detail-locations-container";
+
 let totalItems = Math.max(
     configurations.length,
     orientations.length
@@ -3945,16 +3955,42 @@ for (let i = 0; i < totalItems; i++) {
 
     const location = locations.find(item => {
 
-    if (sign.movementType === "simetrica") {
+    // SEÑAS BIMANUALES SIMÉTRICAS Y ASIMÉTRICAS
 
-        if (i === 0) {
-            return item.role === "base";
+    if (sign.signType === "bimanual") {
+
+        const handRole =
+            configuration?.role ||
+            orientation?.role;
+
+        if (handRole) {
+            return (
+                (item.role || item.hand) === handRole
+            );
         }
 
-        if (i === 1) {
-            return item.role === "dominante";
-        }
     }
+
+    // SEÑAS COMPUESTAS
+
+    if (sign.signType === "compuesta") {
+
+        const elementNumber =
+            configuration?.element ||
+            orientation?.element;
+
+        const handRole =
+            configuration?.hand ||
+            orientation?.hand;
+
+        return (
+            item.element === elementNumber &&
+            (item.hand || item.role) === handRole
+        );
+
+    }
+
+    // OTRAS SEÑAS
 
     if (item.role === "ambas") {
         return true;
@@ -3964,14 +4000,8 @@ for (let i = 0; i < totalItems; i++) {
         return item.role === configuration?.role;
     }
 
-    if (item.element) {
-        return (
-            item.element ===
-            (configuration?.element || orientation?.element)
-        );
-    }
-
     return item.hand === (i + 1);
+
 });
 
     const handContainer =
@@ -4115,7 +4145,8 @@ if (sign.movementType !== "simetrica") {
 
     handContainer.appendChild(orientationField);
 
-    // UBICACIÓN
+
+// UBICACIÓN
 
 if (
     location &&
@@ -4131,10 +4162,29 @@ if (
 
     locationField.className = "detail-field";
 
+    locationField.dataset.element =
+    location.element || 0;
+
+locationField.dataset.hand =
+    location.role || location.hand || "";
+
     const locationTitle =
         document.createElement("h3");
 
+    const handName =
+    location.role || location.hand || "";
+
+if (handName === "dominante") {
+    locationTitle.textContent =
+        "Ubicación – Mano dominante";
+
+} else if (handName === "base") {
+    locationTitle.textContent =
+        "Ubicación – Mano base";
+
+} else {
     locationTitle.textContent = "Ubicación";
+}
 
     const locationDescription =
         document.createElement("p");
@@ -4161,11 +4211,42 @@ if (
     locationField.appendChild(locationTitle);
     locationField.appendChild(locationDescription);
 
-    handContainer.appendChild(locationField);
+    locationDetailsContainer.appendChild(locationField);
 }
 
     signDetailHandDetails.appendChild(handContainer);
 }
+
+// Ordenar ubicaciones: dominante primero, base después
+const locationFields = Array.from(
+    locationDetailsContainer.children
+);
+
+locationFields.sort((a, b) => {
+
+    const order = {
+        dominante: 0,
+        base: 1
+    };
+
+    const handA = a.dataset.hand;
+    const handB = b.dataset.hand;
+
+    const elementA = Number(a.dataset.element);
+    const elementB = Number(b.dataset.element);
+
+    if (elementA !== elementB) {
+        return elementA - elementB;
+    }
+
+    return (order[handA] ?? 2) - (order[handB] ?? 2);
+});
+
+locationFields.forEach(field => {
+    locationDetailsContainer.appendChild(field);
+});
+
+signDetailHandDetails.appendChild(locationDetailsContainer);
 
 // ========================================
 // MOVIMIENTO
